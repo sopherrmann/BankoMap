@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    DatabaseHelper mDatabaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 open_dialog();
             }
         });
+
+
+        mDatabaseHelper = new DatabaseHelper(this);
+        MyLocation test = new MyLocation("session1", 48.0, 16.0, 180.0, "heute");
+        mDatabaseHelper.addData(test);
+        Intent intent = new Intent(this, ListDataActivity.class);
+        startActivity(intent);
     }
 
 
@@ -164,5 +173,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
     }
-
 }
