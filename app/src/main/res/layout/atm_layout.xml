@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_nbatm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@android:drawable/btn_dropdown"
+        android:gravity="left"
+        android:text="Anzahl der Bankomaten" />
+
+    <Button
+        android:id="@+id/btn_bank"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@android:drawable/btn_dropdown"
+        android:gravity="left"
+        android:text="Bank"/>
+    <Button
+        android:id="@+id/btn_charge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="left"
+        android:background="@android:drawable/btn_dropdown"
+        android:text="Gibt es eine Gebühr?"/>
+
+</LinearLayout>

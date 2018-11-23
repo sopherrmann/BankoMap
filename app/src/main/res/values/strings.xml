@@ -1,4 +1,27 @@
 <resources>
     <string name="app_name">BankoMap</string>
     <string name="title_activity_maps">Map</string>
+    <string-array name="numbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5+</item>
+    </string-array>
+
+    <string-array name="banks">
+        <item>Bank Austria</item>
+        <item>BAWAG</item>
+        <item>Deniz Bank AG</item>
+        <item>Erste Group Bank AG</item>
+        <item>Euronet</item>
+        <item>Raiffeisen</item>
+        <item>Volksbank</item>
+        <item>andere</item>
+    </string-array>
+    <string-array name="charge">
+        <item>Ja</item>
+        <item>Nein</item>
+        <item>Unbekannt</item>
+    </string-array>
 </resources>
