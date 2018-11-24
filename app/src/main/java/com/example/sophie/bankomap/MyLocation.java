@@ -15,6 +15,13 @@ class MyLocation {
         this.alt = alt;
         this.time = time;
     }
+    public MyLocation(String session, double lat, double lon, String time) {
+        this.session = session;
+        this.lat = lat;
+        this.lon = lon;
+        this.alt = 0;
+        this.time = time;
+    }
 
     public String getSession() {
         return session;

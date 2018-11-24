@@ -25,9 +25,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.Calendar;
+import java.util.Date;
 
 import static com.example.sophie.bankomap.R.array.numbers;
 
@@ -36,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     DatabaseHelper mDatabaseHelper;
+    String str_sessionName = "unnamed";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +64,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
+        /*
         mDatabaseHelper = new DatabaseHelper(this);
         MyLocation test = new MyLocation("session1", 48.0, 16.0, 180.0, "heute");
         mDatabaseHelper.addData(test);
         Intent intent = new Intent(this, ListDataActivity.class);
         startActivity(intent);
+        */
     }
 
 
@@ -87,6 +97,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         enableMyLocationIfPermitted();
         // Show Zoom and location button
         // mMap.getUiSettings().setZoomControlsEnabled(true);
+
+        // Setting a click event handler for the map
+        mMap.setOnMapLongClickListener(new OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                // Creating a marker
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                // This will be displayed on taping the marker
+                markerOptions.title(String.format("lat: %.2f\nlon: %.2f", latLng.latitude, latLng.longitude));
+                // Clears the previously touched position
+                mMap.clear();
+                // Animating to the touched position
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                mMap.addMarker(markerOptions);
+
+                Date currentTime = Calendar.getInstance().getTime();
+                //Toast.makeText(getApplicationContext(), currentTime.toString(), Toast.LENGTH_SHORT).show();
+                MyLocation myLocation = new MyLocation(str_sessionName, latLng.latitude, latLng.longitude, currentTime.toString());
+                mDatabaseHelper = new DatabaseHelper(getApplicationContext());
+                mDatabaseHelper.addData(myLocation);
+
+                Intent intent = new Intent(getApplicationContext(), ListDataActivity.class);
+                intent.putExtra("session_name", str_sessionName);
+                startActivity(intent);
+            }
+        });
     }
 
     private void enableMyLocationIfPermitted() {
@@ -117,7 +154,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    String str_sessionName = "";
+    //String str_sessionName = "";
     // open dialog to enter a sessionname
     private void open_startdialog(){
         LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -202,6 +239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 btn_atmmap.setVisibility(View.INVISIBLE);
                                 btn_end.setVisibility(View.INVISIBLE);
                                 disp_sesname.setVisibility(View.INVISIBLE);
+                                str_sessionName = "unnamed";
                             }
                 }).setNegativeButton(android.R.string.cancel, null)
                 .create();

@@ -57,7 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Cursor getData(String session){
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + TIME + "=" + "'heute'";
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + SESSION + "='" + session + "'";
         Cursor data = db.rawQuery(query, null);
         return data;
     }
