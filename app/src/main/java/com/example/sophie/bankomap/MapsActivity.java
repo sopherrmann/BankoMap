@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +37,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.Calendar;
 import java.util.Date;
 
-import static com.example.sophie.bankomap.R.array.numbers;
+//import static com.example.sophie.bankomap.R.array.numbers;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -45,6 +45,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     DatabaseHelper mDatabaseHelper;
     String str_sessionName = "unnamed";
+    //Attributes of an ATM
+    Integer str_nbAtm;
+    String str_bank;
+    String str_charge;
+    String str_ophours;
+    Editable str_notes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,15 +164,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // open dialog to enter a sessionname
     private void open_startdialog(){
         LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View vDialog = dialogInflater.inflate(R.layout.dialog_layout, null);
+        View startView = dialogInflater.inflate(R.layout.dialog_layout, null);
 
-        final EditText input = (EditText) vDialog.findViewById(R.id.session_name);
+        final EditText input = (EditText) startView.findViewById(R.id.session_name);
 
-        final AlertDialog sessionDialog = new AlertDialog.Builder(this)
-                .setView(vDialog)
-                .setTitle("Starte eine Session")
-                .setMessage("Bitte geben Sie einen Namen für Ihre Session an:")
-                .setPositiveButton("Weiter",
+        AlertDialog sessionDialog = new AlertDialog.Builder(this)
+                .setView(startView)
+                .setTitle("Start a Session")
+                .setMessage("Please enter the name of your session:")
+                .setPositiveButton("Continue",
                         new Dialog.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface sessionDialog, int which)
@@ -174,7 +180,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 //get the entered name
                                 str_sessionName = input.getText().toString();
                                 if(str_sessionName.compareTo("")==0){
-                                    Toast.makeText(getApplicationContext(),"Bitte Namen eintragen!", Toast.LENGTH_SHORT).show();
+
+                                    Toast.makeText(getApplicationContext(),"Please enter a name!", Toast.LENGTH_SHORT).show();
                                     open_startdialog(); // otherwise Dialog closes, not the best solution
 
                                 } else {
@@ -222,9 +229,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // opens dialog to end a session
     private void open_enddialog(String name){
         AlertDialog endDialog = new AlertDialog.Builder(this)
-                .setTitle("Beenden der Session:"+ name)
-                .setMessage("Wollen Sie diese Session wirklich beenden?")
-                .setPositiveButton("Beenden",
+                .setTitle("End the Session: "+ name)
+                .setMessage("Do you want to exit?")
+                .setPositiveButton("End",
                         new Dialog.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface endDialog, int which) {
@@ -247,77 +254,98 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    String str_nbAtm = new String("");
-    String str_bank = str_nbAtm;
-    String str_charge = str_bank;
     // to enter the information about the ATM
     private void map_atm(){
         LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View vDialog = dialogInflater.inflate(R.layout.atm_layout, null);
+        View atmView = dialogInflater.inflate(R.layout.atm_layout, null);
 
-        // Anzahl der Bankomaten
-        final Button btn_nbatm = vDialog.findViewById(R.id.btn_nbatm);
-        btn_nbatm.setOnClickListener(new View.OnClickListener() {
+        //to the Atm belonging Bank
+        final Button btn_bank  = atmView.findViewById(R.id.btn_bank);
+        btn_bank.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View vDialog) {
-                final String[] numbers = vDialog.getResources().getStringArray(R.array.numbers);
-                final ArrayAdapter<String> adapter_nb = new ArrayAdapter<String>(MapsActivity.this, android.R.layout.simple_spinner_dropdown_item, numbers);
-                new AlertDialog.Builder(MapsActivity.this).setTitle("Anzahl der Bankomaten").setAdapter(adapter_nb, new DialogInterface.OnClickListener() {
+            public void onClick(View v) {
+                final String[] banks = v.getResources().getStringArray(R.array.banks);
+                ArrayAdapter<String> adapter_bank = new ArrayAdapter<>(MapsActivity.this,android.R.layout.simple_spinner_dropdown_item, banks);
+                new AlertDialog.Builder(MapsActivity.this).setTitle("Bank").setAdapter(adapter_bank, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        btn_nbatm.setText(numbers[which]);
-                        str_nbAtm = (String) btn_nbatm.getText();
+                        btn_bank.setText("Bank: " + banks[which]);
+                        str_bank = (String) banks[which];
+
+                        dialog.dismiss();
+                    }
+                }).create().show();
+
+            }
+        });
+
+        // Inside/Outside
+        final Button btn_ophours = atmView.findViewById(R.id.btn_ophours);
+        btn_ophours.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String[] ophours = v.getResources().getStringArray(R.array.ophours);
+                ArrayAdapter<String> adapter_oh = new ArrayAdapter<>(MapsActivity.this, android.R.layout.simple_spinner_dropdown_item, ophours);
+                new AlertDialog.Builder(MapsActivity.this).setTitle("Are there opening hours?").setAdapter(adapter_oh, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        btn_ophours.setText("Opening Hours: " + ophours[which]);
+                        str_ophours = ophours[which];
+
                         dialog.dismiss();
                     }
                 }).create().show();
             }
         });
 
-        //to the Atm belonging Bank
-        final Button btn_bank  = vDialog.findViewById(R.id.btn_bank);
-        btn_bank.setOnClickListener(new View.OnClickListener() {
+        // Number of ATMs
+        final Button btn_nbatm = atmView.findViewById(R.id.btn_nbatm);
+        btn_nbatm.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View vDialog) {
-                final String[] banks = vDialog.getResources().getStringArray(R.array.banks);
-                final ArrayAdapter<String> adapter_bank = new ArrayAdapter<String>(MapsActivity.this,android.R.layout.simple_spinner_dropdown_item, banks);
-                new AlertDialog.Builder(MapsActivity.this).setTitle("Bank").setAdapter(adapter_bank, new DialogInterface.OnClickListener() {
+            public void onClick(View v) {
+                final Integer[] numbers = new Integer[]{1,2,3,4,5,6,7,8,9,10};
+                ArrayAdapter<Integer> adapter_nb = new ArrayAdapter<Integer>(MapsActivity.this, android.R.layout.simple_spinner_dropdown_item, numbers);
+                new AlertDialog.Builder(MapsActivity.this).setTitle("Number of ATMs").setAdapter(adapter_nb, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        btn_bank.setText(banks[which]);
-                        str_bank = (String) btn_bank.getText();
-
+                        btn_nbatm.setText("#ATM: " + numbers[which]);
+                        str_nbAtm = numbers[which];
                         dialog.dismiss();
                     }
                 }).create().show();
-
             }
         });
 
         //Are there any charges
-        final Button btn_charge  = vDialog.findViewById(R.id.btn_charge);
+        final Button btn_charge  = atmView.findViewById(R.id.btn_charge);
         btn_charge.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View vDialog) {
-                final String[] charge = vDialog.getResources().getStringArray(R.array.charge);
-                final ArrayAdapter<String> adapter_charge = new ArrayAdapter<String>(MapsActivity.this,android.R.layout.simple_spinner_dropdown_item, charge);
-                new AlertDialog.Builder(MapsActivity.this).setTitle("Gibt es eine Gebühr?").setAdapter(adapter_charge, new DialogInterface.OnClickListener() {
+            public void onClick(View v) {
+                final String[] charge = v.getResources().getStringArray(R.array.charge);
+                ArrayAdapter<String> adapter_charge = new ArrayAdapter<String>(MapsActivity.this,android.R.layout.simple_spinner_dropdown_item, charge);
+                new AlertDialog.Builder(MapsActivity.this).setTitle("Is there a charge for a withdrawal?").setAdapter(adapter_charge, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        btn_charge.setText(charge[which]);
-                        str_charge = (String) btn_charge.getText();
+                        btn_charge.setText("Charge?: " + charge[which]);
+                        str_charge = (String) charge[which];
                         dialog.dismiss();
                     }
                 }).create().show();
 
             }
         });
+
+        //any notes to the atm
+        final EditText input_notes = atmView.findViewById(R.id.input_notes);
+
         // Dialog in which the information about the ATM can be entered
         final AlertDialog atmDialog = new AlertDialog.Builder(this)
-                .setTitle("BankoMap")
-                .setView(vDialog)
-                .setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
+                .setTitle("Add an ATM")
+                .setView(atmView)
+                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        str_notes = input_notes.getText();
                         //TODO in Datenbank einspeichern
                     }
                 }).setNegativeButton(android.R.string.cancel,null)

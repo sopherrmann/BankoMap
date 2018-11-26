@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <Button
-        android:id="@+id/btn_nbatm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@android:drawable/btn_dropdown"
-        android:gravity="left"
-        android:text="Anzahl der Bankomaten" />
 
     <Button
         android:id="@+id/btn_bank"
@@ -22,6 +14,25 @@
         android:background="@android:drawable/btn_dropdown"
         android:gravity="left"
         android:text="Bank"/>
+
+    <Button
+        android:id="@+id/btn_ophours"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@android:drawable/btn_dropdown"
+        android:gravity="left"
+        android:text="Are there opening hours?" />
+
+    <Button
+        android:id="@+id/btn_nbatm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@android:drawable/btn_dropdown"
+        android:gravity="left"
+        android:text="Number of ATMS" />
+
     <Button
         android:id="@+id/btn_charge"
         android:layout_width="match_parent"
@@ -29,6 +40,32 @@
         android:layout_margin="5dp"
         android:gravity="left"
         android:background="@android:drawable/btn_dropdown"
-        android:text="Gibt es eine Gebühr?"/>
+        android:text="Is there a charge?"/>
+
+    <TextView
+        android:id="@+id/text_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="0dp"
+        android:gravity="left"
+        android:text="Additional Comments to this ATM:"
+        android:textColor="@color/common_google_signin_btn_text_dark_focused"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/input_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="left"
+        android:hint="Any Comments"
+        android:textSize="16sp" />
+
 
 </LinearLayout>

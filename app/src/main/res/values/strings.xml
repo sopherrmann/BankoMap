@@ -1,13 +1,6 @@
 <resources>
     <string name="app_name">BankoMap</string>
     <string name="title_activity_maps">Map</string>
-    <string-array name="numbers">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5+</item>
-    </string-array>
 
     <string-array name="banks">
         <item>Bank Austria</item>
@@ -19,9 +12,15 @@
         <item>Volksbank</item>
         <item>andere</item>
     </string-array>
+
     <string-array name="charge">
-        <item>Ja</item>
-        <item>Nein</item>
-        <item>Unbekannt</item>
+        <item>Yes</item>
+        <item>No</item>
+        <item>Unknown</item>
+    </string-array>
+
+    <string-array name="ophours">
+        <item>Yes</item>
+        <item>No</item>
     </string-array>
 </resources>
