@@ -25,6 +25,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -33,6 +36,8 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -51,11 +56,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String str_charge;
     String str_ophours;
     Editable str_notes;
+    Location curr_location;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -93,41 +101,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        mMap.setOnMyLocationClickListener(new GoogleMap.OnMyLocationClickListener() {
-            @Override
-            public void onMyLocationClick(@NonNull Location location) {
-                Log.d("LocClick", "My location is " + location);
-            }
-        });
-
         enableMyLocationIfPermitted();
         // Show Zoom and location button
         // mMap.getUiSettings().setZoomControlsEnabled(true);
 
         // Setting a click event handler for the map
-        mMap.setOnMapLongClickListener(new OnMapLongClickListener() {
+        mMap.setOnMyLocationClickListener(new GoogleMap.OnMyLocationClickListener() {
             @Override
-            public void onMapLongClick(LatLng latLng) {
-                // Creating a marker
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-                // This will be displayed on taping the marker
-                markerOptions.title(String.format("lat: %.2f\nlon: %.2f", latLng.latitude, latLng.longitude));
-                // Clears the previously touched position
-                mMap.clear();
-                // Animating to the touched position
-                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                mMap.addMarker(markerOptions);
+            public void onMyLocationClick(@NonNull Location location) {
+                Log.d("LocClick", "My location is " + location);
+                curr_location = location;
 
-                Date currentTime = Calendar.getInstance().getTime();
-                //Toast.makeText(getApplicationContext(), currentTime.toString(), Toast.LENGTH_SHORT).show();
-                MyLocation myLocation = new MyLocation(str_sessionName, latLng.latitude, latLng.longitude, currentTime.toString());
+                map_atm();
+                /*
+                MyLocation myLocation = new MyLocation(location, str_sessionName, true, "Austria", 4, false, "info");
                 mDatabaseHelper = new DatabaseHelper(getApplicationContext());
                 mDatabaseHelper.addData(myLocation);
 
                 Intent intent = new Intent(getApplicationContext(), ListDataActivity.class);
                 intent.putExtra("session_name", str_sessionName);
                 startActivity(intent);
+                */
             }
         });
     }
@@ -248,7 +242,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 disp_sesname.setVisibility(View.INVISIBLE);
                                 str_sessionName = "unnamed";
                             }
-                }).setNegativeButton(android.R.string.cancel, null)
+                        }).setNegativeButton(android.R.string.cancel, null)
                 .create();
         endDialog.show();
     }
@@ -331,7 +325,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         dialog.dismiss();
                     }
                 }).create().show();
-
             }
         });
 
@@ -346,7 +339,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         str_notes = input_notes.getText();
-                        //TODO in Datenbank einspeichern
+
+                        MyLocation myLocation = new MyLocation(curr_location, str_sessionName,
+                                true, str_bank, str_nbAtm, false, "info");
+                        mDatabaseHelper = new DatabaseHelper(getApplicationContext());
+                        mDatabaseHelper.addData(myLocation);
+
+                        Intent intent = new Intent(getApplicationContext(), ListDataActivity.class);
+                        intent.putExtra("session_name", str_sessionName);
+                        startActivity(intent);
                     }
                 }).setNegativeButton(android.R.string.cancel,null)
                 .create();

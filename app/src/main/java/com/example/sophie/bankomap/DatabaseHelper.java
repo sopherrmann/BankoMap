@@ -17,6 +17,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LON = "longitude";
     private static final String ALT = "altitude";
     private static final String TIME = "time";
+    private static final String OPEN = "open";
+    private static final String BANK = "bank";
+    private static final String NUMBER = "number";
+    private static final String FEE = "fee";
+    private static final String INFO = "info";
+
+
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -30,7 +37,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 LAT + " REAL, " +
                 LON + " REAL, " +
                 ALT + " REAL, " +
-                TIME + " TEXT)";
+                TIME + " INTEGER, " +
+                OPEN + " BOOL, " +
+                BANK + " TEXT, " +
+                NUMBER + " INTEGER, " +
+                FEE + " BOOL, " +
+                INFO + " TEXT)";
         db.execSQL(createTable);
     }
 
@@ -45,10 +57,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(SESSION, myLocation.getSession());
-        contentValues.put(LAT, myLocation.getLat());
-        contentValues.put(LON, myLocation.getLon());
-        contentValues.put(ALT, myLocation.getAlt());
-        contentValues.put(TIME, myLocation.getTime());
+        contentValues.put(LAT, myLocation.getLocation().getLatitude());
+        contentValues.put(LON, myLocation.getLocation().getLongitude());
+        contentValues.put(ALT, myLocation.getLocation().getLatitude());
+        contentValues.put(TIME, myLocation.getLocation().getTime());
+        contentValues.put(OPEN, myLocation.isOpen());
+        contentValues.put(BANK, myLocation.getBank());
+        contentValues.put(NUMBER, myLocation.getNum());
+        contentValues.put(FEE, myLocation.isFee());
+        contentValues.put(INFO, myLocation.getInfo());
 
         //Log.d(TAG, "addData: Adding " + item + " to " + TABLE_NAME);
         long result = db.insert(TABLE_NAME, null, contentValues);

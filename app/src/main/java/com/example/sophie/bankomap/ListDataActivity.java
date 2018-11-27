@@ -14,13 +14,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.security.acl.Group;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.Inflater;
 
 public class ListDataActivity extends AppCompatActivity {
@@ -30,10 +35,23 @@ public class ListDataActivity extends AppCompatActivity {
     private ListView mlistView;
     ArrayList<ListViewData> listData;
 
+    Map<String, Integer> logodict;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_data);
+
+        logodict = new HashMap<String, Integer>();
+        logodict.put("Bank Austria", R.drawable.logo_bank_austria);
+        logodict.put("BAWAG", R.drawable.logo_bawag);
+        logodict.put("Deniz Bank AG", R.drawable.logo_denizbank);
+        logodict.put("Erste Group Bank AG", R.drawable.logo_erste);
+        logodict.put("Euronet", R.drawable.logo_euronet);
+        logodict.put("Raiffeisen", R.drawable.logo_raiffeisen);
+        logodict.put("Volksbank", R.drawable.logo_volksbank);
+        logodict.put("andere", R.drawable.logo_bank_austria); // TODO
 
         Intent intent = getIntent();
         String session_name = intent.getStringExtra("session_name");
@@ -50,9 +68,10 @@ public class ListDataActivity extends AppCompatActivity {
         listData = new ArrayList<>();
         while(data.moveToNext()){
             ListViewData lvd = new ListViewData(data.getString(1),
-                                                data.getString(5),
+                                                data.getInt(5),
                                                 data.getDouble(2),
-                                                data.getDouble(3));
+                                                data.getDouble(3),
+                                                data.getString(7));
             Toast.makeText(this, data.getString(1), Toast.LENGTH_SHORT).show();
             listData.add(lvd);
         }
@@ -61,19 +80,22 @@ public class ListDataActivity extends AppCompatActivity {
     }
 
     class ListViewData{
-        String session, date;
-        Double lat, lon;
+        String session;
+        int date;
+        double lat, lon;
+        String bank;
 
-        public ListViewData(String session, String date, Double lat, Double lon){
+        public ListViewData(String session, int date, double lat, double lon, String bank){
             this.session = session;
             this.date = date;
             this.lat = lat;
             this.lon = lon;
+            this.bank = bank;
         }
         public String getSession() {
             return session;
         }
-        public String getDate() {
+        public int getDate() {
             return date;
         }
         public Double getLat() {
@@ -81,6 +103,9 @@ public class ListDataActivity extends AppCompatActivity {
         }
         public Double getLon() {
             return lon;
+        }
+        public String getBank() {
+            return bank;
         }
     }
 
@@ -106,15 +131,18 @@ public class ListDataActivity extends AppCompatActivity {
             TextView timeView = (TextView) view.findViewById(R.id.viewTime);
             TextView latView = (TextView) view.findViewById(R.id.viewLat);
             TextView lonView = (TextView) view.findViewById(R.id.viewLon);
+            ImageView logoView = (ImageView) view.findViewById(R.id.viewLogo);
 
             ListViewData l = listData.get(position);
 
             String x = l.getSession();
 
             sessionView.setText(l.getSession());
-            timeView.setText(l.getDate());
+            Date currentDate = new Date(l.getDate());
+            timeView.setText(currentDate.toString());
             latView.setText(String.format("%.2f", l.getLat()));
             lonView.setText(String.format("%.2f", l.getLon()));
+            logoView.setImageResource(logodict.get(l.getBank()));
 
             return view;
         }

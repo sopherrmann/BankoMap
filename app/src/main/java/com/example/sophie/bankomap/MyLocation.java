@@ -1,45 +1,56 @@
 package com.example.sophie.bankomap;
 
+import android.location.Location;
+
 class MyLocation {
 
+    private Location location;
     private String session;
-    private double lat;
-    private double lon;
-    private double alt;
-    private String time;
+    private boolean open;
+    private String bank;
+    private int num;
+    private boolean fee;
+    private String info;
+    //private double lat;
+    //private double lon;
+    //private double alt;
+    //private String time;
 
-    public MyLocation(String session, double lat, double lon, double alt, String time) {
+    public MyLocation(Location location, String session, boolean open, String bank, int num, boolean fee, String info) {
+        this.location = location;
         this.session = session;
-        this.lat = lat;
-        this.lon = lon;
-        this.alt = alt;
-        this.time = time;
+        this.open = open;
+        this.bank = bank;
+        this.num = num;
+        this.fee = fee;
+        this.info = info;
     }
-    public MyLocation(String session, double lat, double lon, String time) {
-        this.session = session;
-        this.lat = lat;
-        this.lon = lon;
-        this.alt = 0;
-        this.time = time;
+
+    public Location getLocation() {
+        return location;
     }
 
     public String getSession() {
         return session;
     }
 
-    public double getLat() {
-        return lat;
+    public boolean isOpen() {
+        return open;
     }
 
-    public double getLon() {
-        return lon;
+    public String getBank() {
+        return bank;
     }
 
-    public double getAlt() {
-        return alt;
+    public int getNum() {
+        return num;
     }
 
-    public String getTime() {
-        return time;
+    public boolean isFee() {
+        return fee;
+    }
+
+    public String getInfo() {
+        return info;
     }
 }

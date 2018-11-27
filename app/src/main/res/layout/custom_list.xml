@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,8 +13,8 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
+        android:layout_marginStart="67dp"
+        android:layout_marginLeft="67dp"
         android:layout_marginTop="10dp"
         android:text="TextView" />
 
@@ -36,17 +38,17 @@
         android:layout_marginStart="165dp"
         android:layout_marginLeft="165dp"
         android:layout_marginTop="10dp"
-        android:text="TextView" />
+        android:text="0" />
 
     <TextView
         android:id="@+id/viewLon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/viewLat"
+        android:layout_marginStart="226dp"
+        android:layout_marginLeft="226dp"
         android:layout_marginTop="0dp"
-        android:layout_marginStart="250dp"
-        android:layout_marginLeft="280dp"
-        android:text="TextView" />
+        android:text="0" />
 
     <TextView
         android:id="@+id/lat"
@@ -63,11 +65,44 @@
         android:id="@+id/lon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_alignTop="@+id/viewLat"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="200dp"
+        android:layout_marginLeft="200dp"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="225dp"
-        android:layout_marginLeft="225dp"
         android:text="lon:" />
+
+    <ImageView
+        android:id="@+id/viewLogo"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="10dp"
+        app:srcCompat="@drawable/logo_euronet" />
+
+    <Button
+        android:id="@+id/buttonDelete"
+        android:layout_width="70dp"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="280dp"
+        android:layout_marginLeft="67dp"
+        android:layout_marginTop="9dp"
+        android:background="@android:color/holo_red_dark"
+        android:text="delete"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/buttonChange"
+        android:layout_width="70dp"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="280dp"
+        android:layout_marginLeft="67dp"
+        android:layout_marginTop="35dp"
+        android:background="@android:color/holo_blue_bright"
+        android:text="modify"
+        android:textColor="@android:color/white" />
 
 </RelativeLayout>
