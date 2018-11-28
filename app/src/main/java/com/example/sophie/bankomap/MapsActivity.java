@@ -73,6 +73,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        mDatabaseHelper = new DatabaseHelper(this);
+
         btn_start = findViewById(R.id.btn_start);
         btn_load = findViewById(R.id.btn_load);
         btn_atmmap = findViewById(R.id.btn_atmmap);
@@ -137,8 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void showMarkers(String session){
         // Clears the previously touched position
         mMap.clear();
-        DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
-        Cursor cursor = databaseHelper.getData(session);
+        Cursor cursor = mDatabaseHelper.getData(session);
         while(cursor.moveToNext()){
 
             LatLng latLng = new LatLng(cursor.getDouble(2), cursor.getDouble(3));
@@ -223,8 +224,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
-        DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
-        Cursor cursor = databaseHelper.getSessions();
+        Cursor cursor = mDatabaseHelper.getSessions();
 
         while(cursor.moveToNext()){
             arrayAdapter.add(cursor.getString(0));
@@ -330,8 +330,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 disp_sesname.setVisibility(View.INVISIBLE);
 
                                 deleteMarkers();
-                                DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
-                                databaseHelper.deleteSession(str_sessionName);
+                                mDatabaseHelper.deleteSession(str_sessionName);
                                 str_sessionName = "unnamed";
                             }
                         }).setNegativeButton("No", new Dialog.OnClickListener() {
@@ -436,10 +435,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         str_notes = input_notes.getText();
-
                         MyLocation myLocation = new MyLocation(curr_location, str_sessionName,
                                 str_ophours, str_bank, str_nbAtm, str_charge, str_notes.toString());
-                        mDatabaseHelper = new DatabaseHelper(getApplicationContext());
                         mDatabaseHelper.addData(myLocation);
                         showMarkers(str_sessionName);
                     }

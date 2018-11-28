@@ -7,14 +7,15 @@
 
 
     <TextView
-        android:id="@+id/viewSession"
+        android:id="@+id/viewBank"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="67dp"
-        android:layout_marginLeft="67dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:text="TextView" />
 
@@ -22,54 +23,49 @@
         android:id="@+id/viewTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/viewSession"
-        android:layout_alignStart="@+id/viewSession"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="35dp"
-        android:text="TextView"
-         />
+        android:layout_marginStart="160dp"
+        android:layout_marginLeft="160dp"
+        android:layout_marginTop="10dp"
+        android:text="TextView" />
 
     <TextView
         android:id="@+id/viewLat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginStart="165dp"
-        android:layout_marginLeft="165dp"
-        android:layout_marginTop="10dp"
-        android:text="0" />
-
-    <TextView
-        android:id="@+id/viewLon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/viewLat"
-        android:layout_marginStart="226dp"
-        android:layout_marginLeft="226dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginStart="85dp"
+        android:layout_marginLeft="85dp"
+        android:layout_marginTop="33dp"
         android:text="0" />
 
     <TextView
         android:id="@+id/lat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/viewLat"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="140dp"
-        android:layout_marginLeft="140dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginLeft="55dp"
+        android:layout_marginTop="33dp"
         android:text="lat:" />
+
+    <TextView
+        android:id="@+id/viewLon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="85dp"
+        android:layout_marginLeft="85dp"
+        android:layout_marginTop="55dp"
+        android:text="0" />
 
     <TextView
         android:id="@+id/lon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/viewLat"
+        android:layout_alignTop="@+id/viewLon"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="200dp"
-        android:layout_marginLeft="200dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginLeft="55dp"
+        android:layout_marginTop="55dp"
         android:text="lon:" />
 
     <ImageView
@@ -77,8 +73,8 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="12dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="33dp"
         app:srcCompat="@drawable/logo_euronet" />
 
     <Button
@@ -88,9 +84,49 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="280dp"
         android:layout_marginLeft="67dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="41dp"
         android:background="@android:color/holo_red_dark"
         android:text="delete"
         android:textColor="@android:color/white" />
+
+
+    <TextView
+        android:id="@+id/viewOpen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="190dp"
+        android:layout_marginLeft="190dp"
+        android:layout_marginTop="33dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/open"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="150dp"
+        android:layout_marginLeft="150dp"
+        android:layout_marginTop="33dp"
+        android:text="open:" />
+
+    <TextView
+        android:id="@+id/viewFee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="190dp"
+        android:layout_marginLeft="190dp"
+        android:layout_marginTop="55dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/fee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/viewLon"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="150dp"
+        android:layout_marginLeft="150dp"
+        android:layout_marginTop="55dp"
+        android:text="fee:" />
 
 </RelativeLayout>

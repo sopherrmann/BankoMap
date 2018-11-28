@@ -29,27 +29,21 @@ class MyLocation {
     public Location getLocation() {
         return location;
     }
-
     public String getSession() {
         return session;
     }
-
     public String getOpen() {
         return open;
     }
-
     public String getBank() {
         return bank;
     }
-
     public int getNum() {
         return num;
     }
-
     public String getFee() {
         return fee;
     }
-
     public String getInfo() {
         return info;
     }
