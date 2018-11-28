@@ -40,9 +40,7 @@ public class ListDataActivity extends AppCompatActivity {
     DatabaseHelper mDatabaseHelper;
     private ListView mlistView;
     ArrayList<ListViewData> listData;
-
     Map<String, Integer> logodict;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

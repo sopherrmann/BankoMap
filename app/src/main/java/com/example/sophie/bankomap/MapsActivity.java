@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.graphics.MaskFilter;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -60,41 +61,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Location curr_location;
     private FusedLocationProviderClient mFusedLocationClient;
 
+    Button btn_start;
+    Button btn_load;
+    Button btn_atmmap;
+    Button btn_end;
+    Button btn_del;
+    TextView disp_sesname;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        btn_start = findViewById(R.id.btn_start);
+        btn_load = findViewById(R.id.btn_load);
+        btn_atmmap = findViewById(R.id.btn_atmmap);
+        btn_end = findViewById(R.id.btn_end);
+        btn_del = findViewById(R.id.btn_del);
+        disp_sesname = findViewById(R.id.disp_sesname);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        final Button btn_start = findViewById(R.id.btn_start);
-        final Button btn_load = findViewById(R.id.btn_load);
         btn_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View start_session) {
                 open_startdialog();
             }
         });
-
         btn_load.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View start_session) {
                 open_loaddialog();
             }
         });
-
-        /*
-        mDatabaseHelper = new DatabaseHelper(this);
-        MyLocation test = new MyLocation("session1", 48.0, 16.0, 180.0, "heute");
-        mDatabaseHelper.addData(test);
-        Intent intent = new Intent(this, ListDataActivity.class);
-        startActivity(intent);
-        */
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        deleteMarkers();
+        showMarkers(str_sessionName);
+    }
 
     /**
      * Manipulates the map once available.
@@ -119,19 +129,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMyLocationClick(@NonNull Location location) {
                 Log.d("LocClick", "My location is " + location);
                 curr_location = location;
-
                 map_atm();
-                /*
-                MyLocation myLocation = new MyLocation(location, str_sessionName, true, "Austria", 4, false, "info");
-                mDatabaseHelper = new DatabaseHelper(getApplicationContext());
-                mDatabaseHelper.addData(myLocation);
-
-                Intent intent = new Intent(getApplicationContext(), ListDataActivity.class);
-                intent.putExtra("session_name", str_sessionName);
-                startActivity(intent);
-                */
             }
         });
+    }
+
+    public void showMarkers(String session){
+        // Clears the previously touched position
+        mMap.clear();
+        DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
+        Cursor cursor = databaseHelper.getData(session);
+        while(cursor.moveToNext()){
+
+            LatLng latLng = new LatLng(cursor.getDouble(2), cursor.getDouble(3));
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title(cursor.getString(7));
+            // Animating to the touched position
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.addMarker(markerOptions);
+        }
+    }
+
+    public void deleteMarkers(){
+        mMap.clear();
     }
 
     private void enableMyLocationIfPermitted() {
@@ -221,20 +242,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(DialogInterface dialog, int which) {
                 str_sessionName = arrayAdapter.getItem(which);
                 start_session(str_sessionName);
+                showMarkers(str_sessionName);
             }});
         builderSingle.show();
     }
 
     // Now you can add ATMs
     private void start_session(final String name){
-        final Button btn_start = findViewById(R.id.btn_start);
-        final Button btn_load = findViewById(R.id.btn_load);
         btn_start.setVisibility(View.INVISIBLE);
         btn_load.setVisibility(View.INVISIBLE);
-
-        final Button btn_atmmap = findViewById(R.id.btn_atmmap);
-        final Button btn_end = findViewById(R.id.btn_end);
-        final TextView disp_sesname = findViewById(R.id.disp_sesname);
+        btn_atmmap.setVisibility(View.VISIBLE);
+        btn_end.setVisibility(View.VISIBLE);
+        btn_del.setVisibility(View.VISIBLE);
+        disp_sesname.setVisibility(View.VISIBLE);
 
         disp_sesname.setText(name);
         disp_sesname.setOnClickListener(new View.OnClickListener() {
@@ -245,10 +265,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
             }
         });
-
-        btn_atmmap.setVisibility(View.VISIBLE);
-        btn_end.setVisibility(View.VISIBLE);
-        disp_sesname.setVisibility(View.VISIBLE);
 
         btn_atmmap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,49 +279,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 open_enddialog(name);
             }
         });
+        btn_del.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //end Session
+                open_deldialog(name);
+            }
+        });
     }
 
     // opens dialog to end a session
     private void open_enddialog(String name){
         AlertDialog endDialog = new AlertDialog.Builder(this)
                 .setTitle("End the Session: "+ name)
-                .setMessage("Do you want to save the session?")
+                .setMessage("Do you really want to end the session?")
                 .setPositiveButton("Yes",
                         new Dialog.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface endDialog, int which) {
-                                final Button btn_start = findViewById(R.id.btn_start);
-                                final Button btn_load = findViewById(R.id.btn_load);
                                 btn_start.setVisibility(View.VISIBLE);
                                 btn_load.setVisibility(View.VISIBLE);
-
-                                final Button btn_atmmap = findViewById(R.id.btn_atmmap);
-                                final Button btn_end = findViewById(R.id.btn_end);
-                                final TextView disp_sesname = findViewById(R.id.disp_sesname);
                                 btn_atmmap.setVisibility(View.INVISIBLE);
                                 btn_end.setVisibility(View.INVISIBLE);
+                                btn_del.setVisibility(View.INVISIBLE);
                                 disp_sesname.setVisibility(View.INVISIBLE);
                                 str_sessionName = "unnamed";
+                                deleteMarkers();
                             }
                         }).setNegativeButton("No", new Dialog.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface endDialog, int which) {
-                                final Button btn_start = findViewById(R.id.btn_start);
-                                final Button btn_load = findViewById(R.id.btn_load);
+                            }}).create();
+        endDialog.show();
+    }
+
+    // opens dialog to end a session
+    private void open_deldialog(String name){
+        AlertDialog endDialog = new AlertDialog.Builder(this)
+                .setTitle("Delete the Session: "+ name)
+                .setMessage("Do you really want to delete the session?")
+                .setPositiveButton("Yes",
+                        new Dialog.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface endDialog, int which) {
                                 btn_start.setVisibility(View.VISIBLE);
                                 btn_load.setVisibility(View.VISIBLE);
-
-                                final Button btn_atmmap = findViewById(R.id.btn_atmmap);
-                                final Button btn_end = findViewById(R.id.btn_end);
-                                final TextView disp_sesname = findViewById(R.id.disp_sesname);
                                 btn_atmmap.setVisibility(View.INVISIBLE);
                                 btn_end.setVisibility(View.INVISIBLE);
+                                btn_del.setVisibility(View.INVISIBLE);
                                 disp_sesname.setVisibility(View.INVISIBLE);
+
+                                deleteMarkers();
                                 DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
                                 databaseHelper.deleteSession(str_sessionName);
                                 str_sessionName = "unnamed";
-                            }}).setNeutralButton("Cancel", null)
-                .create();
+                            }
+                        }).setNegativeButton("No", new Dialog.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface endDialog, int which) {
+                    }}).create();
         endDialog.show();
     }
 
@@ -332,7 +364,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onClick(DialogInterface dialog, int which) {
                         btn_bank.setText("Bank: " + banks[which]);
                         str_bank = (String) banks[which];
-
                         dialog.dismiss();
                     }
                 }).create().show();
@@ -352,7 +383,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onClick(DialogInterface dialog, int which) {
                         btn_ophours.setText("Opening Hours: " + ophours[which]);
                         str_ophours = ophours[which];
-
                         dialog.dismiss();
                     }
                 }).create().show();
@@ -411,6 +441,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 str_ophours, str_bank, str_nbAtm, str_charge, str_notes.toString());
                         mDatabaseHelper = new DatabaseHelper(getApplicationContext());
                         mDatabaseHelper.addData(myLocation);
+                        showMarkers(str_sessionName);
                     }
                 }).setNegativeButton(android.R.string.cancel,null)
                 .create();

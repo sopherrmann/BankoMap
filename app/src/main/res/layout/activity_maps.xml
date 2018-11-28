@@ -68,6 +68,16 @@
         android:visibility="invisible"
         android:text="End" />
 
+    <Button
+        android:id="@+id/btn_del"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/btn_atmmap"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="36dp"
+        android:text="Delete"
+        android:visibility="invisible" />
+
     <TextView
         android:id="@+id/disp_sesname"
         android:layout_width="200dp"
