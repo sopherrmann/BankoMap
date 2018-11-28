@@ -6,17 +6,17 @@ class MyLocation {
 
     private Location location;
     private String session;
-    private boolean open;
+    private String open;
     private String bank;
     private int num;
-    private boolean fee;
+    private String fee;
     private String info;
     //private double lat;
     //private double lon;
     //private double alt;
     //private String time;
 
-    public MyLocation(Location location, String session, boolean open, String bank, int num, boolean fee, String info) {
+    public MyLocation(Location location, String session, String open, String bank, int num, String fee, String info) {
         this.location = location;
         this.session = session;
         this.open = open;
@@ -34,7 +34,7 @@ class MyLocation {
         return session;
     }
 
-    public boolean isOpen() {
+    public String getOpen() {
         return open;
     }
 
@@ -46,7 +46,7 @@ class MyLocation {
         return num;
     }
 
-    public boolean isFee() {
+    public String getFee() {
         return fee;
     }
 

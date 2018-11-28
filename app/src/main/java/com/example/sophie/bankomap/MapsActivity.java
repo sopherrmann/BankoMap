@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.MaskFilter;
 import android.location.Location;
 import android.os.Bundle;
@@ -75,6 +76,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View start_session) {
                 open_startdialog();
+            }
+        });
+
+        btn_load.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View start_session) {
+                open_loaddialog();
             }
         });
 
@@ -190,6 +198,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         sessionDialog.show();
     }
 
+    private void open_loaddialog(){
+
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
+        DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
+        Cursor cursor = databaseHelper.getSessions();
+
+        while(cursor.moveToNext()){
+            arrayAdapter.add(cursor.getString(0));
+        }
+
+        builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                str_sessionName = arrayAdapter.getItem(which);
+                start_session(str_sessionName);
+            }});
+        builderSingle.show();
+    }
+
     // Now you can add ATMs
     private void start_session(final String name){
         final Button btn_start = findViewById(R.id.btn_start);
@@ -200,7 +235,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final Button btn_atmmap = findViewById(R.id.btn_atmmap);
         final Button btn_end = findViewById(R.id.btn_end);
         final TextView disp_sesname = findViewById(R.id.disp_sesname);
+
         disp_sesname.setText(name);
+        disp_sesname.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ListDataActivity.class);
+                intent.putExtra("session_name", str_sessionName);
+                startActivity(intent);
+            }
+        });
+
         btn_atmmap.setVisibility(View.VISIBLE);
         btn_end.setVisibility(View.VISIBLE);
         disp_sesname.setVisibility(View.VISIBLE);
@@ -224,8 +269,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void open_enddialog(String name){
         AlertDialog endDialog = new AlertDialog.Builder(this)
                 .setTitle("End the Session: "+ name)
-                .setMessage("Do you want to exit?")
-                .setPositiveButton("End",
+                .setMessage("Do you want to save the session?")
+                .setPositiveButton("Yes",
                         new Dialog.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface endDialog, int which) {
@@ -242,7 +287,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 disp_sesname.setVisibility(View.INVISIBLE);
                                 str_sessionName = "unnamed";
                             }
-                        }).setNegativeButton(android.R.string.cancel, null)
+                        }).setNegativeButton("No", new Dialog.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface endDialog, int which) {
+                                final Button btn_start = findViewById(R.id.btn_start);
+                                final Button btn_load = findViewById(R.id.btn_load);
+                                btn_start.setVisibility(View.VISIBLE);
+                                btn_load.setVisibility(View.VISIBLE);
+
+                                final Button btn_atmmap = findViewById(R.id.btn_atmmap);
+                                final Button btn_end = findViewById(R.id.btn_end);
+                                final TextView disp_sesname = findViewById(R.id.disp_sesname);
+                                btn_atmmap.setVisibility(View.INVISIBLE);
+                                btn_end.setVisibility(View.INVISIBLE);
+                                disp_sesname.setVisibility(View.INVISIBLE);
+                                DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
+                                databaseHelper.deleteSession(str_sessionName);
+                                str_sessionName = "unnamed";
+                            }}).setNeutralButton("Cancel", null)
                 .create();
         endDialog.show();
     }
@@ -252,6 +314,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void map_atm(){
         LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View atmView = dialogInflater.inflate(R.layout.atm_layout, null);
+
+        str_nbAtm = 0;
+        str_bank = "Other";
+        str_charge = "Unknown";
+        str_ophours = "Unknown";
 
         //to the Atm belonging Bank
         final Button btn_bank  = atmView.findViewById(R.id.btn_bank);
@@ -341,13 +408,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         str_notes = input_notes.getText();
 
                         MyLocation myLocation = new MyLocation(curr_location, str_sessionName,
-                                true, str_bank, str_nbAtm, false, "info");
+                                str_ophours, str_bank, str_nbAtm, str_charge, str_notes.toString());
                         mDatabaseHelper = new DatabaseHelper(getApplicationContext());
                         mDatabaseHelper.addData(myLocation);
-
-                        Intent intent = new Intent(getApplicationContext(), ListDataActivity.class);
-                        intent.putExtra("session_name", str_sessionName);
-                        startActivity(intent);
                     }
                 }).setNegativeButton(android.R.string.cancel,null)
                 .create();

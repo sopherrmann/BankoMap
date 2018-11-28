@@ -1,6 +1,7 @@
 package com.example.sophie.bankomap;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -8,12 +9,14 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -21,7 +24,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.security.acl.Group;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +57,7 @@ public class ListDataActivity extends AppCompatActivity {
         logodict.put("Euronet", R.drawable.logo_euronet);
         logodict.put("Raiffeisen", R.drawable.logo_raiffeisen);
         logodict.put("Volksbank", R.drawable.logo_volksbank);
-        logodict.put("andere", R.drawable.logo_bank_austria); // TODO
+        logodict.put("Other", R.drawable.logo_bank_austria); // TODO
 
         Intent intent = getIntent();
         String session_name = intent.getStringExtra("session_name");
@@ -67,8 +73,9 @@ public class ListDataActivity extends AppCompatActivity {
         Cursor data = mDatabaseHelper.getData(session);
         listData = new ArrayList<>();
         while(data.moveToNext()){
-            ListViewData lvd = new ListViewData(data.getString(1),
-                                                data.getInt(5),
+            ListViewData lvd = new ListViewData(data.getInt(0),
+                                                data.getString(1),
+                                                data.getLong(5),
                                                 data.getDouble(2),
                                                 data.getDouble(3),
                                                 data.getString(7));
@@ -81,21 +88,27 @@ public class ListDataActivity extends AppCompatActivity {
 
     class ListViewData{
         String session;
-        int date;
+        long date;
+        int id;
         double lat, lon;
         String bank;
 
-        public ListViewData(String session, int date, double lat, double lon, String bank){
+        public ListViewData(int id, String session, long date, double lat, double lon, String bank){
+            this.id = id;
             this.session = session;
             this.date = date;
             this.lat = lat;
             this.lon = lon;
             this.bank = bank;
         }
+
+        public int getId() {
+            return id;
+        }
         public String getSession() {
             return session;
         }
-        public int getDate() {
+        public long getDate() {
             return date;
         }
         public Double getLat() {
@@ -123,7 +136,7 @@ public class ListDataActivity extends AppCompatActivity {
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(cont);
             View view = inflater.inflate(resource, null);
 
@@ -132,19 +145,54 @@ public class ListDataActivity extends AppCompatActivity {
             TextView latView = (TextView) view.findViewById(R.id.viewLat);
             TextView lonView = (TextView) view.findViewById(R.id.viewLon);
             ImageView logoView = (ImageView) view.findViewById(R.id.viewLogo);
+            Button deleteButton = (Button) view.findViewById(R.id.buttonDelete);
+
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    removeItem(position);
+                }
+            });
 
             ListViewData l = listData.get(position);
 
             String x = l.getSession();
 
             sessionView.setText(l.getSession());
+
             Date currentDate = new Date(l.getDate());
+            //DateFormat df = //new SimpleDateFormat("dd:MM:yy:HH:mm:ss");
             timeView.setText(currentDate.toString());
             latView.setText(String.format("%.2f", l.getLat()));
             lonView.setText(String.format("%.2f", l.getLon()));
             logoView.setImageResource(logodict.get(l.getBank()));
 
             return view;
+        }
+
+        public void removeItem(final int pos){
+            AlertDialog.Builder builder = new AlertDialog.Builder(cont);
+            builder.setTitle("Are you sure you want to delete?");
+
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i){
+
+                    DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
+                    databaseHelper.deleteRow(listData.get(pos).getId());
+                    listData.remove(pos);
+                    notifyDataSetChanged();
+                }
+            });
+
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i){
+                }
+            });
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         }
     }
 }

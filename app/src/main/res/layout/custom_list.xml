@@ -88,21 +88,9 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="280dp"
         android:layout_marginLeft="67dp"
-        android:layout_marginTop="9dp"
+        android:layout_marginTop="10dp"
         android:background="@android:color/holo_red_dark"
         android:text="delete"
-        android:textColor="@android:color/white" />
-
-    <Button
-        android:id="@+id/buttonChange"
-        android:layout_width="70dp"
-        android:layout_height="20dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="280dp"
-        android:layout_marginLeft="67dp"
-        android:layout_marginTop="35dp"
-        android:background="@android:color/holo_blue_bright"
-        android:text="modify"
         android:textColor="@android:color/white" />
 
 </RelativeLayout>

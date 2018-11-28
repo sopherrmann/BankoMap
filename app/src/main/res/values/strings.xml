@@ -10,7 +10,7 @@
         <item>Euronet</item>
         <item>Raiffeisen</item>
         <item>Volksbank</item>
-        <item>andere</item>
+        <item>Other</item>
     </string-array>
 
     <string-array name="charge">
@@ -22,5 +22,6 @@
     <string-array name="ophours">
         <item>Yes</item>
         <item>No</item>
+        <item>Unknown</item>
     </string-array>
 </resources>

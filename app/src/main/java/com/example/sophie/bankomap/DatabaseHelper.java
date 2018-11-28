@@ -38,10 +38,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 LON + " REAL, " +
                 ALT + " REAL, " +
                 TIME + " INTEGER, " +
-                OPEN + " BOOL, " +
+                OPEN + " TEXT, " +
                 BANK + " TEXT, " +
                 NUMBER + " INTEGER, " +
-                FEE + " BOOL, " +
+                FEE + " TEXT, " +
                 INFO + " TEXT)";
         db.execSQL(createTable);
     }
@@ -61,10 +61,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(LON, myLocation.getLocation().getLongitude());
         contentValues.put(ALT, myLocation.getLocation().getLatitude());
         contentValues.put(TIME, myLocation.getLocation().getTime());
-        contentValues.put(OPEN, myLocation.isOpen());
+        contentValues.put(OPEN, myLocation.getOpen());
         contentValues.put(BANK, myLocation.getBank());
         contentValues.put(NUMBER, myLocation.getNum());
-        contentValues.put(FEE, myLocation.isFee());
+        contentValues.put(FEE, myLocation.getFee());
         contentValues.put(INFO, myLocation.getInfo());
 
         //Log.d(TAG, "addData: Adding " + item + " to " + TABLE_NAME);
@@ -75,6 +75,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getData(String session){
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + SESSION + "='" + session + "'";
+        Cursor data = db.rawQuery(query, null);
+        return data;
+    }
+
+    public boolean deleteRow(int id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_NAME, ID + "=" + id, null) > 0;
+    }
+
+    public boolean deleteSession(String session){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_NAME,  "session=?", new String[]{session}) > 0;
+    }
+
+    public Cursor getSessions(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT distinct session FROM " + TABLE_NAME;
         Cursor data = db.rawQuery(query, null);
         return data;
     }
