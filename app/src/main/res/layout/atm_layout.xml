@@ -1,57 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <Button
-        android:id="@+id/btn_bank"
+    <LinearLayout
+        android:id="@+id/ly_bank"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@android:drawable/btn_dropdown"
-        android:gravity="left"
-        android:text="Bank"/>
+        android:layout_alignParentTop="true">
 
-    <Button
-        android:id="@+id/btn_ophours"
+        <Button
+            android:id="@+id/btn_bank"
+            android:layout_width="0dp"
+            android:layout_weight="0.90"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:gravity="start"
+            android:text="@string/btn_namebank" />
+
+        <ImageButton
+            android:id="@+id/btn_info_bank"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="0.10"
+            android:background="@drawable/common_full_open_on_phone"
+            android:src="@android:drawable/ic_menu_info_details" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ly_ophours"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@android:drawable/btn_dropdown"
-        android:gravity="left"
-        android:text="Are there opening hours?" />
+        android:layout_below="@+id/ly_bank">
+        <Button
+            android:id="@+id/btn_ophours"
+            android:layout_width="0dp"
+            android:layout_weight="0.9"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:gravity="start"
+            android:text="@string/btn_nameophours" />
 
-    <Button
-        android:id="@+id/btn_nbatm"
+        <ImageButton
+            android:id="@+id/btn_info_ophours"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/common_full_open_on_phone"
+            android:src="@android:drawable/ic_menu_info_details" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ly_nbatm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@android:drawable/btn_dropdown"
-        android:gravity="left"
-        android:text="Number of ATMS" />
+        android:layout_below="@id/ly_ophours">
+        <Button
+            android:id="@+id/btn_nbatm"
+            android:layout_width="0dp"
+            android:layout_weight="0.9"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:gravity="start"
+            android:text="@string/btn_namenbatm" />
 
-    <Button
-        android:id="@+id/btn_charge"
+        <ImageButton
+            android:id="@+id/btn_info_nbatm"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/common_full_open_on_phone"
+            android:src="@android:drawable/ic_menu_info_details" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ly_charge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:gravity="left"
-        android:background="@android:drawable/btn_dropdown"
-        android:text="Is there a charge?"/>
+        android:layout_below="@id/ly_nbatm">
+        <Button
+            android:id="@+id/btn_charge"
+            android:layout_width="0dp"
+            android:layout_weight="0.9"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:gravity="start"
+            android:text="@string/btn_nameCharge" />
+
+        <ImageButton
+            android:id="@+id/btn_info_charge"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/common_full_open_on_phone"
+            android:src="@android:drawable/ic_menu_info_details" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/text_notes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/ly_charge"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="0dp"
-        android:gravity="left"
-        android:text="Additional Comments to this ATM:"
+        android:gravity="start"
+        android:text="@string/tv_nameComments"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
         android:textSize="16sp" />
 
@@ -59,13 +133,13 @@
         android:id="@+id/input_notes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/text_notes"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="0dp"
         android:layout_marginRight="5dp"
         android:layout_marginBottom="5dp"
-        android:gravity="left"
-        android:hint="Any Comments"
+        android:gravity="start"
+        android:hint="@string/tv_hintComments"
         android:textSize="16sp" />
 
-
-</LinearLayout>
+</RelativeLayout>

@@ -2,7 +2,9 @@ package com.example.sophie.bankomap;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,22 +12,34 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.MaskFilter;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationResult;
@@ -192,23 +206,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         final EditText input = (EditText) startView.findViewById(R.id.session_name);
 
-        AlertDialog sessionDialog = new AlertDialog.Builder(this)
+        AlertDialog sessionDialog = new Builder(this)
                 .setView(startView)
                 .setTitle("Start a Session")
                 .setMessage("Please enter the name of your session:")
                 .setPositiveButton("Continue",
                         new Dialog.OnClickListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                             @Override
                             public void onClick(DialogInterface sessionDialog, int which)
                             {
                                 //get the entered name
                                 str_sessionName = input.getText().toString();
                                 if(str_sessionName.compareTo("")==0){
-
                                     Toast.makeText(getApplicationContext(),"Please enter a name!", Toast.LENGTH_SHORT).show();
                                     open_startdialog(); // otherwise Dialog closes, not the best solution
 
-                                } else {
+                                } else if(str_sessionName.length()>16){
+                                    Toast.makeText(getApplicationContext(),"Your entered name is too long, please enter a short name!", Toast.LENGTH_SHORT).show();
+                                    open_startdialog();
+                                }else {
                                     //Start the Session and save sessionname
                                     sessionDialog.cancel();
                                     start_session(str_sessionName);
@@ -222,7 +239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void open_loaddialog(){
 
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+        Builder builderSingle = new Builder(this);
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
         Cursor cursor = mDatabaseHelper.getSessions();
 
@@ -238,6 +255,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 str_sessionName = arrayAdapter.getItem(which);
@@ -248,15 +266,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // Now you can add ATMs
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void start_session(final String name){
         btn_start.setVisibility(View.INVISIBLE);
         btn_load.setVisibility(View.INVISIBLE);
         btn_atmmap.setVisibility(View.VISIBLE);
         btn_end.setVisibility(View.VISIBLE);
         btn_del.setVisibility(View.VISIBLE);
-        disp_sesname.setVisibility(View.VISIBLE);
-
         disp_sesname.setText(name);
+
+        findViewById(R.id.header).setVisibility(View.VISIBLE);
+
         disp_sesname.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -279,6 +299,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 open_enddialog(name);
             }
         });
+
         btn_del.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -290,10 +311,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // opens dialog to end a session
     private void open_enddialog(String name){
-        AlertDialog endDialog = new AlertDialog.Builder(this)
+        AlertDialog endDialog = new Builder(this)
                 .setTitle("End the Session: "+ name)
                 .setMessage("Do you really want to end the session?")
                 .setPositiveButton("Yes",
+
                         new Dialog.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface endDialog, int which) {
@@ -302,7 +324,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 btn_atmmap.setVisibility(View.INVISIBLE);
                                 btn_end.setVisibility(View.INVISIBLE);
                                 btn_del.setVisibility(View.INVISIBLE);
-                                disp_sesname.setVisibility(View.INVISIBLE);
+                                findViewById(R.id.header).setVisibility(View.GONE);
                                 str_sessionName = "unnamed";
                                 deleteMarkers();
                             }
@@ -315,7 +337,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // opens dialog to end a session
     private void open_deldialog(String name){
-        AlertDialog endDialog = new AlertDialog.Builder(this)
+        AlertDialog endDialog = new Builder(this)
                 .setTitle("Delete the Session: "+ name)
                 .setMessage("Do you really want to delete the session?")
                 .setPositiveButton("Yes",
@@ -327,7 +349,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 btn_atmmap.setVisibility(View.INVISIBLE);
                                 btn_end.setVisibility(View.INVISIBLE);
                                 btn_del.setVisibility(View.INVISIBLE);
-                                disp_sesname.setVisibility(View.INVISIBLE);
+                                findViewById(R.id.header).setVisibility(View.GONE);
 
                                 deleteMarkers();
                                 mDatabaseHelper.deleteSession(str_sessionName);
@@ -346,10 +368,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View atmView = dialogInflater.inflate(R.layout.atm_layout, null);
 
+
         str_nbAtm = 0;
         str_bank = "Other";
         str_charge = "Unknown";
         str_ophours = "Unknown";
+        //info Boxes
+        atmView.findViewById(R.id.btn_info_bank).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                open_info(v.getResources().getString(R.string.info_bank));
+            }
+        });
+
+        atmView.findViewById(R.id.btn_info_ophours).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                open_info(v.getResources().getString(R.string.info_ophours));
+            }
+        });
+
+        atmView.findViewById(R.id.btn_info_nbatm).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                open_info(v.getResources().getString(R.string.info_nbatm));
+            }
+        });
+
+        atmView.findViewById(R.id.btn_info_charge).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                open_info(v.getResources().getString(R.string.info_charge));
+            }
+        });
+
 
         //to the Atm belonging Bank
         final Button btn_bank  = atmView.findViewById(R.id.btn_bank);
@@ -358,7 +410,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 final String[] banks = v.getResources().getStringArray(R.array.banks);
                 ArrayAdapter<String> adapter_bank = new ArrayAdapter<>(MapsActivity.this,android.R.layout.simple_spinner_dropdown_item, banks);
-                new AlertDialog.Builder(MapsActivity.this).setTitle("Bank").setAdapter(adapter_bank, new DialogInterface.OnClickListener() {
+                new Builder(MapsActivity.this).setTitle("Bank").setAdapter(adapter_bank, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         btn_bank.setText("Bank: " + banks[which]);
@@ -377,7 +429,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 final String[] ophours = v.getResources().getStringArray(R.array.ophours);
                 ArrayAdapter<String> adapter_oh = new ArrayAdapter<>(MapsActivity.this, android.R.layout.simple_spinner_dropdown_item, ophours);
-                new AlertDialog.Builder(MapsActivity.this).setTitle("Are there opening hours?").setAdapter(adapter_oh, new DialogInterface.OnClickListener() {
+                new Builder(MapsActivity.this).setTitle("Are there opening hours?").setAdapter(adapter_oh, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         btn_ophours.setText("Opening Hours: " + ophours[which]);
@@ -395,7 +447,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 final Integer[] numbers = new Integer[]{1,2,3,4,5,6,7,8,9,10};
                 ArrayAdapter<Integer> adapter_nb = new ArrayAdapter<Integer>(MapsActivity.this, android.R.layout.simple_spinner_dropdown_item, numbers);
-                new AlertDialog.Builder(MapsActivity.this).setTitle("Number of ATMs").setAdapter(adapter_nb, new DialogInterface.OnClickListener() {
+                new Builder(MapsActivity.this).setTitle("Number of ATMs").setAdapter(adapter_nb, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         btn_nbatm.setText("#ATM: " + numbers[which]);
@@ -413,7 +465,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 final String[] charge = v.getResources().getStringArray(R.array.charge);
                 ArrayAdapter<String> adapter_charge = new ArrayAdapter<String>(MapsActivity.this,android.R.layout.simple_spinner_dropdown_item, charge);
-                new AlertDialog.Builder(MapsActivity.this).setTitle("Is there a charge for a withdrawal?").setAdapter(adapter_charge, new DialogInterface.OnClickListener() {
+                new Builder(MapsActivity.this).setTitle("Is there a charge for a withdrawal?").setAdapter(adapter_charge, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         btn_charge.setText("Charge?: " + charge[which]);
@@ -428,7 +480,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final EditText input_notes = atmView.findViewById(R.id.input_notes);
 
         // Dialog in which the information about the ATM can be entered
-        final AlertDialog atmDialog = new AlertDialog.Builder(this)
+        final AlertDialog atmDialog = new Builder(this)
                 .setTitle("Add an ATM")
                 .setView(atmView)
                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
@@ -444,5 +496,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .create();
 
         atmDialog.show();
+    }
+
+    private void open_info(String text){
+        new Builder(this).setTitle("Info").setMessage(text).create().show();
     }
 }

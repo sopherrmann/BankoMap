@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">BankoMap</string>
     <string name="title_activity_maps">Map</string>
+    <string name="btn_namebank">Bank</string>
+    <string name="btn_nameophours">Are there opening hours?</string>
+    <string name="btn_namenbatm">Number of ATMS</string>
+    <string name="tv_nameComments">Additional Comments to this ATM:</string>
+    <string name="tv_hintComments">Any Comments</string>
+    <string name="btn_nameCharge">Is there a charge?</string>
 
     <string-array name="banks">
         <item>Bank Austria</item>
@@ -24,4 +30,20 @@
         <item>No</item>
         <item>Unknown</item>
     </string-array>
+
+    <string name="info_bank">
+        Select the institution to which the ATM belongs.
+    </string>
+
+    <string name="info_ophours">
+        If the ATM is inside a supermarket, the accessibility depends on the opening hours of the shop. It is important to now, if and when the ATM is accessible.
+    </string>
+
+    <string name="info_nbatm">
+        How many ATMs are at this location?
+    </string>
+
+    <string name="info_charge">
+        Does the ATM charge anything when withdrawing money?
+    </string>
 </resources>
