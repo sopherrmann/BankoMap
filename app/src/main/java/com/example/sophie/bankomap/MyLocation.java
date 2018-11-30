@@ -1,5 +1,6 @@
 package com.example.sophie.bankomap;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 
 class MyLocation {
@@ -11,12 +12,13 @@ class MyLocation {
     private int num;
     private String fee;
     private String info;
+    private byte[] image;
     //private double lat;
     //private double lon;
     //private double alt;
     //private String time;
 
-    public MyLocation(Location location, String session, String open, String bank, int num, String fee, String info) {
+    public MyLocation(Location location, String session, String open, String bank, int num, String fee, String info, byte[] image) {
         this.location = location;
         this.session = session;
         this.open = open;
@@ -24,6 +26,7 @@ class MyLocation {
         this.num = num;
         this.fee = fee;
         this.info = info;
+        this.image = image;
     }
 
     public Location getLocation() {
@@ -46,5 +49,8 @@ class MyLocation {
     }
     public String getInfo() {
         return info;
+    }
+    public byte[] getImage() {
+        return image;
     }
 }

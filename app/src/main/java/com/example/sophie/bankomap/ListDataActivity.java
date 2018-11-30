@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -74,7 +75,8 @@ public class ListDataActivity extends AppCompatActivity {
                                                 data.getDouble(3),
                                                 data.getString(7),
                                                 data.getString(9),
-                                                data.getString(6));
+                                                data.getString(6),
+                                                data.getBlob(11));
             Toast.makeText(this, data.getString(1), Toast.LENGTH_SHORT).show();
             listData.add(lvd);
         }
@@ -88,8 +90,9 @@ public class ListDataActivity extends AppCompatActivity {
         int id;
         double lat, lon;
         String bank;
+        byte[] image;
 
-        public ListViewData(int id, String session, long date, double lat, double lon, String bank, String fee, String open){
+        public ListViewData(int id, String session, long date, double lat, double lon, String bank, String fee, String open, byte[] image){
             this.id = id;
             this.session = session;
             this.date = date;
@@ -98,6 +101,7 @@ public class ListDataActivity extends AppCompatActivity {
             this.bank = bank;
             this.fee = fee;
             this.open = open;
+            this.image = image;
         }
 
         public int getId() {
@@ -123,6 +127,9 @@ public class ListDataActivity extends AppCompatActivity {
         }
         public String getOpen() {
             return open;
+        }
+        public byte[] getImage() {
+            return image;
         }
     }
 
@@ -152,6 +159,7 @@ public class ListDataActivity extends AppCompatActivity {
             TextView feeView = (TextView) view.findViewById(R.id.viewFee);
             ImageView logoView = (ImageView) view.findViewById(R.id.viewLogo);
             Button deleteButton = (Button) view.findViewById(R.id.buttonDelete);
+            ImageView photoView = (ImageView) view.findViewById(R.id.viewPhoto);
 
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -173,6 +181,7 @@ public class ListDataActivity extends AppCompatActivity {
             logoView.setImageResource(logodict.get(l.getBank()));
             openView.setText(l.getOpen());
             feeView.setText(l.getFee());
+            photoView.setImageBitmap(BitmapFactory.decodeByteArray(l.getImage(), 0, l.getImage().length));
             return view;
         }
 

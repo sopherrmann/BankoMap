@@ -10,12 +10,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.MaskFilter;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -35,6 +40,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -55,12 +61,19 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.Date;
 
 //import static com.example.sophie.bankomap.R.array.numbers;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
+    Button takeImage;
+    private static final int CAM_REQUEST = 1313;
+    ImageView imageView;
+    Bitmap bitmap;
+    byte[] image;
 
     private GoogleMap mMap;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -88,6 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
 
         mDatabaseHelper = new DatabaseHelper(this);
+        //mDatabaseHelper.getReadableDatabase(); for getting updated database
 
         btn_start = findViewById(R.id.btn_start);
         btn_load = findViewById(R.id.btn_load);
@@ -148,6 +162,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 map_atm();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == CAM_REQUEST){
+            LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            bitmap = (Bitmap) data.getExtras().get("data");
+            //View atmView = dialogInflater.inflate(R.layout.atm_layout, null);
+            //Button btn_image = (Button) atmView.findViewById(R.id.btn_image);
+            //btn_image.setBackgroundColor(Color.RED);
+        }
     }
 
     public void showMarkers(String session){
@@ -368,7 +395,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View atmView = dialogInflater.inflate(R.layout.atm_layout, null);
 
-
         str_nbAtm = 0;
         str_bank = "Other";
         str_charge = "Unknown";
@@ -476,6 +502,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        final Button btn_image = atmView.findViewById(R.id.btn_image);
+        btn_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, CAM_REQUEST);
+            }
+        });
+
         //any notes to the atm
         final EditText input_notes = atmView.findViewById(R.id.input_notes);
 
@@ -487,10 +522,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         str_notes = input_notes.getText();
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        if(bitmap == null){
+                            bitmap = BitmapFactory.decodeResource(getResources(),
+                                    R.drawable.logo_bank_austria);
+                        }
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+                        image = stream.toByteArray();
                         MyLocation myLocation = new MyLocation(curr_location, str_sessionName,
-                                str_ophours, str_bank, str_nbAtm, str_charge, str_notes.toString());
+                                str_ophours, str_bank, str_nbAtm, str_charge, str_notes.toString(), image);
                         mDatabaseHelper.addData(myLocation);
                         showMarkers(str_sessionName);
+                        bitmap = null;
                     }
                 }).setNegativeButton(android.R.string.cancel,null)
                 .create();

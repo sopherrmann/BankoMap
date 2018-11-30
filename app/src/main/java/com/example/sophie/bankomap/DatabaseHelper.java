@@ -22,6 +22,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String NUMBER = "number";
     private static final String FEE = "fee";
     private static final String INFO = "info";
+    private static final String IMAGE = "image";
 
 
 
@@ -42,7 +43,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 BANK + " TEXT, " +
                 NUMBER + " INTEGER, " +
                 FEE + " TEXT, " +
-                INFO + " TEXT)";
+                INFO + " TEXT, " +
+                IMAGE + " BLOB)";
         db.execSQL(createTable);
     }
 
@@ -66,6 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(NUMBER, myLocation.getNum());
         contentValues.put(FEE, myLocation.getFee());
         contentValues.put(INFO, myLocation.getInfo());
+        contentValues.put(IMAGE, myLocation.getImage());
 
         //Log.d(TAG, "addData: Adding " + item + " to " + TABLE_NAME);
         long result = db.insert(TABLE_NAME, null, contentValues);

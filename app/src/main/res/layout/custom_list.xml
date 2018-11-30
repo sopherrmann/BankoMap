@@ -129,4 +129,16 @@
         android:layout_marginTop="55dp"
         android:text="fee:" />
 
+    <ImageView
+        android:id="@+id/viewPhoto"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="21dp"
+        android:layout_marginLeft="21dp"
+        android:layout_marginTop="93dp"
+        tools:srcCompat="@tools:sample/avatars[0]" />
+
 </RelativeLayout>
