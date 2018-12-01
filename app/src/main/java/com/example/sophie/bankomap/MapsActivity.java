@@ -101,7 +101,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
 
         mDatabaseHelper = new DatabaseHelper(this);
-        //mDatabaseHelper.getReadableDatabase(); for getting updated database
 
         btn_start = findViewById(R.id.btn_start);
         btn_load = findViewById(R.id.btn_load);

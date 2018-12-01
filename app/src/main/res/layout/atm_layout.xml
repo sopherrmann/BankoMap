@@ -146,10 +146,10 @@
         android:id="@+id/btn_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/text_notes"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="2dp"
-        android:layout_marginBottom="142dp"
-        android:text="AddImage" />
+        android:layout_below="@+id/input_notes"
+        android:layout_marginTop="10dp"
+        android:layout_alignStart="@+id/input_notes"
+        android:layout_alignLeft="@+id/input_notes"
+        android:text="Add Image" />
 
 </RelativeLayout>
