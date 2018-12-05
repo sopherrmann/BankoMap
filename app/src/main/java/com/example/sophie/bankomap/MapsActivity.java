@@ -126,6 +126,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 open_loaddialog();
             }
         });
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
     @Override
@@ -315,6 +317,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_atmmap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                set_curr_location();  // Set curr_location
+                // TODO handle null location
                 map_atm();
             }
         });
@@ -388,6 +392,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         endDialog.show();
     }
 
+
+    private void set_curr_location(){
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        curr_location =  location;
+                        Toast.makeText(getApplicationContext(),"Location object" + location.toString(), Toast.LENGTH_SHORT).show();
+                        //if (location != null) {
+                            // Logic to handle location object
+                        //}
+                    }
+                });
+    }
 
     // to enter the information about the ATM
     private void map_atm(){
