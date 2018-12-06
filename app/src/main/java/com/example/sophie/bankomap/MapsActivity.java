@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.MaskFilter;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +44,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,13 +61,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import org.w3c.dom.Text;
+
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 //import static com.example.sophie.bankomap.R.array.numbers;
 
@@ -78,11 +89,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     DatabaseHelper mDatabaseHelper;
-    String str_sessionName = "unnamed";
+    String str_sessionName;
     //Attributes of an ATM
     Integer str_nbAtm;
     String str_bank;
-    String str_charge;
+    String str_fee;
     String str_ophours;
     Editable str_notes;
     Location curr_location;
@@ -94,6 +105,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button btn_end;
     Button btn_del;
     TextView disp_sesname;
+
+    Map<String, Integer> logodict;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +123,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_del = findViewById(R.id.btn_del);
         disp_sesname = findViewById(R.id.disp_sesname);
 
+        // Logos für die Banken
+        logodict = new HashMap<String, Integer>();
+        logodict.put("Bank Austria", R.drawable.logo_bank_austria);
+        logodict.put("BAWAG", R.drawable.logo_bawag);
+        logodict.put("Deniz Bank AG", R.drawable.logo_denizbank);
+        logodict.put("Erste Group Bank AG", R.drawable.logo_erste);
+        logodict.put("Euronet", R.drawable.logo_euronet);
+        logodict.put("Raiffeisen", R.drawable.logo_raiffeisen);
+        logodict.put("Volksbank", R.drawable.logo_volksbank);
+        logodict.put("Other", R.drawable.logo_other);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -149,20 +173,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         enableMyLocationIfPermitted();
+
+        LatLng latlng = new LatLng(48.2087623, 16.3725753); // TODO: change latlng to current location!
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
         // Show Zoom and location button
         // mMap.getUiSettings().setZoomControlsEnabled(true);
 
         // Setting a click event handler for the map
-        mMap.setOnMyLocationClickListener(new GoogleMap.OnMyLocationClickListener() {
+        /*mMap.setOnMyLocationClickListener(new GoogleMap.OnMyLocationClickListener() {
             @Override
             public void onMyLocationClick(@NonNull Location location) {
                 Log.d("LocClick", "My location is " + location);
                 curr_location = location;
                 map_atm();
             }
-        });
+        });*/
     }
 
     @Override
@@ -172,25 +199,89 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(requestCode == CAM_REQUEST){
             LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             bitmap = (Bitmap) data.getExtras().get("data");
-            //View atmView = dialogInflater.inflate(R.layout.atm_layout, null);
-            //Button btn_image = (Button) atmView.findViewById(R.id.btn_image);
+            View atmView = dialogInflater.inflate(R.layout.atm_layout, null);
+
+            //Button btn_im = (Button) atmView.findViewById(R.id.btn_image);
+            //btn_im.setText("Change Image");
             //btn_image.setBackgroundColor(Color.RED);
         }
     }
 
-    public void showMarkers(String session){
+    public void showMarkers(final String session){
         // Clears the previously touched position
         mMap.clear();
-        Cursor cursor = mDatabaseHelper.getData(session);
+        final Cursor cursor = mDatabaseHelper.getData(session);
         while(cursor.moveToNext()){
-
             LatLng latLng = new LatLng(cursor.getDouble(2), cursor.getDouble(3));
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
-            markerOptions.title(cursor.getString(7));
             // Animating to the touched position
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.addMarker(markerOptions);
+            Marker mMarker = mMap.addMarker(markerOptions);
+            mMarker.setTag(cursor.getInt(0));
+
+            //Pop-up for each marker
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    LayoutInflater marker_infoInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View marker_infoView = marker_infoInflater.inflate(R.layout.marker_info_layout, null);
+                    final int curr_ID = (int) marker.getTag();
+                    Cursor data_row = mDatabaseHelper.getRow(curr_ID);
+                    data_row.moveToNext();
+                    final AlertDialog info_builder = new AlertDialog.Builder(MapsActivity.this)
+                            .setTitle(data_row.getString(7))
+                            .setView(marker_infoView).create();
+
+                    info_builder.show();
+
+
+                    TextView tv_fee = marker_infoView.findViewById(R.id.viewFee);
+                    TextView tv_ophours = marker_infoView.findViewById(R.id.viewOpen);
+                    TextView tv_nbatms = marker_infoView.findViewById(R.id.viewNbatm);
+                    TextView tv_comments = marker_infoView.findViewById(R.id.viewComments);
+                    TextView tv_lat = marker_infoView.findViewById(R.id.viewLat);
+                    TextView tv_lon = marker_infoView.findViewById(R.id.viewLon);
+                    TextView tv_time = marker_infoView.findViewById(R.id.viewTime);
+                    ImageView logoView = marker_infoView.findViewById(R.id.viewLogo);
+                    ImageView photoView = marker_infoView.findViewById(R.id.viewPhoto);
+                    Button btn_deleteMarker = marker_infoView.findViewById(R.id.buttonDelete);
+                    btn_deleteMarker.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            removeItem(curr_ID);
+                            info_builder.dismiss();
+                        }
+                    });
+
+                    tv_fee.setText(data_row.getString(9));
+                    tv_ophours.setText(data_row.getString(6));
+                    tv_nbatms.setText(data_row.getString(8));
+                    tv_comments.setText(data_row.getString(10));
+                    tv_lat.setText(String.format("%.2f",data_row.getDouble(2)));
+                    tv_lon.setText(String.format("%.2f", data_row.getDouble(3)));
+                    Date currentDate = new Date(data_row.getLong(5));
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(currentDate);
+                    SimpleDateFormat sdf = new SimpleDateFormat("E yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+                    String datetext = sdf.format(currentDate);
+                    tv_time.setText(datetext);
+                    logoView.setImageResource(logodict.get(data_row.getString(7)));
+
+                    // if there is no image for the ATM
+
+                    if (data_row.getBlob(11).length == 0){
+                        LinearLayout ll_photo =  marker_infoView.findViewById(R.id.third_line);
+                        ll_photo.setVisibility(View.GONE);
+                        LinearLayout ll_delete = marker_infoView.findViewById(R.id.fourth_line);
+
+                    }
+                    else {
+                        photoView.setImageBitmap(BitmapFactory.decodeByteArray(data_row.getBlob(11), 0, data_row.getBlob(11).length));
+                    }
+                    return false;
+                }
+            });
         }
     }
 
@@ -257,6 +348,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     //Start the Session and save sessionname
                                     sessionDialog.cancel();
                                     start_session(str_sessionName);
+
+                                    Toast.makeText(getApplicationContext(), "Click on the Sessionname to see all registered ATMs", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         })
@@ -287,6 +380,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 str_sessionName = arrayAdapter.getItem(which);
+                Toast.makeText(getApplicationContext(), "Click on the Sessionname to see all registered ATMs", Toast.LENGTH_SHORT).show();
                 start_session(str_sessionName);
                 showMarkers(str_sessionName);
             }});
@@ -400,7 +494,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         curr_location =  location;
-                        Toast.makeText(getApplicationContext(),"Location object" + location.toString(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(),"Location object" + location.toString(), Toast.LENGTH_SHORT).show();
                         //if (location != null) {
                             // Logic to handle location object
                         //}
@@ -415,7 +509,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         str_nbAtm = 0;
         str_bank = "Other";
-        str_charge = "Unknown";
+        str_fee = "Unknown";
         str_ophours = "Unknown";
         //info Boxes
         atmView.findViewById(R.id.btn_info_bank).setOnClickListener(new View.OnClickListener() {
@@ -439,13 +533,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        atmView.findViewById(R.id.btn_info_charge).setOnClickListener(new View.OnClickListener() {
+        atmView.findViewById(R.id.btn_info_fee).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                open_info(v.getResources().getString(R.string.info_charge));
+                open_info(v.getResources().getString(R.string.info_fee));
             }
         });
-
 
         //to the Atm belonging Bank
         final Button btn_bank  = atmView.findViewById(R.id.btn_bank);
@@ -502,18 +595,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        //Are there any charges
-        final Button btn_charge  = atmView.findViewById(R.id.btn_charge);
-        btn_charge.setOnClickListener(new View.OnClickListener() {
+        //Is there a fee
+        final Button btn_fee  = atmView.findViewById(R.id.btn_fee);
+        btn_fee.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String[] charge = v.getResources().getStringArray(R.array.charge);
-                ArrayAdapter<String> adapter_charge = new ArrayAdapter<String>(MapsActivity.this,android.R.layout.simple_spinner_dropdown_item, charge);
-                new Builder(MapsActivity.this).setTitle("Is there a charge for a withdrawal?").setAdapter(adapter_charge, new DialogInterface.OnClickListener() {
+                final String[] fee = v.getResources().getStringArray(R.array.fee);
+                ArrayAdapter<String> adapter_fee = new ArrayAdapter<String>(MapsActivity.this,android.R.layout.simple_spinner_dropdown_item, fee);
+                new Builder(MapsActivity.this).setTitle("Is there a fee for a withdrawal?").setAdapter(adapter_fee, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        btn_charge.setText("Charge?: " + charge[which]);
-                        str_charge = (String) charge[which];
+                        btn_fee.setText("Fee?: " + fee[which]);
+                        str_fee = (String) fee[which];
                         dialog.dismiss();
                     }
                 }).create().show();
@@ -526,6 +619,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(intent, CAM_REQUEST);
+                // TODO: show that image has been saved
             }
         });
 
@@ -541,14 +635,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onClick(DialogInterface dialog, int which) {
                         str_notes = input_notes.getText();
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        if(bitmap == null){
+                        /*if(bitmap == null){
                             bitmap = BitmapFactory.decodeResource(getResources(),
                                     R.drawable.logo_bank_austria);
+                        }*/
+                        if(bitmap != null){
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
                         }
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
                         image = stream.toByteArray();
                         MyLocation myLocation = new MyLocation(curr_location, str_sessionName,
-                                str_ophours, str_bank, str_nbAtm, str_charge, str_notes.toString(), image);
+                                str_ophours, str_bank, str_nbAtm, str_fee, str_notes.toString(), image);
                         mDatabaseHelper.addData(myLocation);
                         showMarkers(str_sessionName);
                         bitmap = null;
@@ -562,4 +658,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void open_info(String text){
         new Builder(this).setTitle("Info").setMessage(text).create().show();
     }
+
+    //
+    public void removeItem(final int pos){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Are you sure you want to delete?");
+
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i){
+                //DatabaseHelper databaseHelper = new DatabaseHelper(getApplicationContext());
+                mDatabaseHelper.deleteRow(pos);
+                onRestart();
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i){
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+
+
 }

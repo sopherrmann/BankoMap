@@ -89,22 +89,22 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ly_charge"
+        android:id="@+id/ly_fee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/ly_nbatm">
         <Button
-            android:id="@+id/btn_charge"
+            android:id="@+id/btn_fee"
             android:layout_width="0dp"
             android:layout_weight="0.9"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:background="@android:drawable/btn_dropdown"
             android:gravity="start"
-            android:text="@string/btn_nameCharge" />
+            android:text="@string/btn_nameFee" />
 
         <ImageButton
-            android:id="@+id/btn_info_charge"
+            android:id="@+id/btn_info_fee"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="5dp"
@@ -119,7 +119,7 @@
         android:id="@+id/text_notes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ly_charge"
+        android:layout_below="@id/ly_fee"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
@@ -151,5 +151,4 @@
         android:layout_alignStart="@+id/input_notes"
         android:layout_alignLeft="@+id/input_notes"
         android:text="Add Image" />
-
 </RelativeLayout>

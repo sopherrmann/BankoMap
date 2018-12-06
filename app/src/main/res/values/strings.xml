@@ -6,7 +6,7 @@
     <string name="btn_namenbatm">Number of ATMS</string>
     <string name="tv_nameComments">Additional Comments to this ATM:</string>
     <string name="tv_hintComments">Any Comments</string>
-    <string name="btn_nameCharge">Is there a charge?</string>
+    <string name="btn_nameFee">Is there a fee?</string>
 
     <string-array name="banks">
         <item>Bank Austria</item>
@@ -19,7 +19,7 @@
         <item>Other</item>
     </string-array>
 
-    <string-array name="charge">
+    <string-array name="fee">
         <item>Yes</item>
         <item>No</item>
         <item>Unknown</item>
@@ -43,7 +43,7 @@
         How many ATMs are at this location?
     </string>
 
-    <string name="info_charge">
+    <string name="info_fee">
         Does the ATM charge anything when withdrawing money?
     </string>
 </resources>

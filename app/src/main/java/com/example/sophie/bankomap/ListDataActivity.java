@@ -52,7 +52,7 @@ public class ListDataActivity extends AppCompatActivity {
         logodict.put("Euronet", R.drawable.logo_euronet);
         logodict.put("Raiffeisen", R.drawable.logo_raiffeisen);
         logodict.put("Volksbank", R.drawable.logo_volksbank);
-        logodict.put("Other", R.drawable.logo_bank_austria); // TODO
+        logodict.put("Other", R.drawable.logo_other);
 
         Intent intent = getIntent();
         String session_name = intent.getStringExtra("session_name");
@@ -181,7 +181,11 @@ public class ListDataActivity extends AppCompatActivity {
             logoView.setImageResource(logodict.get(l.getBank()));
             openView.setText(l.getOpen());
             feeView.setText(l.getFee());
-            photoView.setImageBitmap(BitmapFactory.decodeByteArray(l.getImage(), 0, l.getImage().length));
+            if(l.getImage().length == 0){
+                photoView.setVisibility(View.GONE);
+            } else {
+                photoView.setImageBitmap(BitmapFactory.decodeByteArray(l.getImage(), 0, l.getImage().length));
+            }
             return view;
         }
 
