@@ -1,6 +1,7 @@
 package com.example.sophie.bankomap;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -75,6 +76,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import static com.example.sophie.bankomap.R.layout.atm_layout;
 
 //import static com.example.sophie.bankomap.R.array.numbers;
 
@@ -195,14 +198,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if(requestCode == CAM_REQUEST){
-            LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            //LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             bitmap = (Bitmap) data.getExtras().get("data");
-            View atmView = dialogInflater.inflate(R.layout.atm_layout, null);
+            //View atmView = dialogInflater.inflate(atm_layout, null);
+            View view = getLayoutInflater().inflate(R.layout.atm_layout, null);
 
+            //Button btn_img = view.findViewById(R.id.btn_image);
             //Button btn_im = (Button) atmView.findViewById(R.id.btn_image);
-            //btn_im.setText("Change Image");
+            //btn_img.setText("Change Image");
             //btn_image.setBackgroundColor(Color.RED);
         }
     }
@@ -312,8 +316,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     mMap.setMyLocationEnabled(true);
-                else
-                    finish();
+                else {
+                    Toast.makeText(MapsActivity.this, "App cannot be used without allowing to acces your Location",Toast.LENGTH_LONG)
+                            .show();
+                    enableMyLocationIfPermitted();
+                }
         }
     }
 

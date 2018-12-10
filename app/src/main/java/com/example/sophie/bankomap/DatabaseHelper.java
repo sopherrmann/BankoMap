@@ -1,10 +1,24 @@
 package com.example.sophie.bankomap;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+import android.widget.Toast;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
+
+import java.nio.channels.FileChannel;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -61,7 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(SESSION, myLocation.getSession());
         contentValues.put(LAT, myLocation.getLocation().getLatitude());
         contentValues.put(LON, myLocation.getLocation().getLongitude());
-        contentValues.put(ALT, myLocation.getLocation().getLatitude());
+        contentValues.put(ALT, myLocation.getLocation().getAltitude()); // TODO hier wird trotzdem nur latitude angezeigt
         contentValues.put(TIME, myLocation.getLocation().getTime());
         contentValues.put(OPEN, myLocation.getOpen());
         contentValues.put(BANK, myLocation.getBank());
@@ -102,6 +116,67 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT distinct session FROM " + TABLE_NAME;
         Cursor data = db.rawQuery(query, null);
         return data;
+    }
+
+    public void exportDB(Activity act, int all, String session){
+        // all = 0 exports only one Session
+        // all = 1 exports all session
+        try {
+            SQLiteDatabase sqldb = this.getReadableDatabase();
+            Cursor c = null;
+            if (all == 0) {
+                c = sqldb.rawQuery("select * from " + TABLE_NAME + " WHERE " + SESSION + " = '" + session + "'", null);
+            } else {
+                c = sqldb.rawQuery("select * from " + TABLE_NAME, null);
+            }
+            int rowcount = 0;
+            int colcount = 0;
+            File sdCardDir = Environment.getExternalStorageDirectory();
+            session = session.replaceAll("\\s","");
+            String filename = session + ".csv";
+            // the name of the file to export with or the String allSessions if you export all
+            File saveFile = new File(sdCardDir, filename);
+            FileWriter fw = new FileWriter(saveFile);
+            BufferedWriter bw = new BufferedWriter(fw); //BufferedWriter
+            rowcount = c.getCount();
+            colcount = c.getColumnCount();
+
+            if (rowcount > 0) {
+                c.moveToFirst();
+                for (int i = 0; i < colcount; i++) {
+                    if (i != colcount - 1) {
+                        if(c.getColumnName(i) == "ID"){
+                            // sonst gibt es Probleme beim Öffnen der Datei
+                            // erstes Element darf nicht gleich ID sein
+                            bw.write("'" + c.getColumnName(i) + ",");
+                        } else {
+                            bw.write(c.getColumnName(i) + ",");
+                        }
+                    } else {
+                        bw.write(c.getColumnName(i));
+                    }
+                }
+                bw.newLine();
+                for (int i = 0; i < rowcount; i++) {
+                    c.moveToPosition(i);
+                    bw.write(c.getInt(0) + "," + c.getString(1) + "," + c.getDouble(2) + ",");
+                    bw.write(c.getDouble(3) + ","+ c.getDouble(4) + "," + c.getLong(5) + ",");
+                    bw.write(c.getString(6) + "," + c.getString(7) + "," + c.getInt(8) + ",");
+                    bw.write(c.getString(9) + "," + c.getInt(10) + "," + c.getBlob(11));
+                    bw.newLine();
+
+                }
+                bw.flush();
+                bw.close();
+                Toast.makeText(act, "Exported Successfully.", Toast.LENGTH_SHORT).show();
+                // TODO enable Permission to store something
+                // TODO data is not saved as csv but as sylk!, add dependency for csvWriter
+            }
+        } catch (Exception e) {
+            // TODO
+            Toast.makeText(act, e.toString(), Toast.LENGTH_LONG)
+                    .show();
+        }
     }
 }
 

@@ -1,17 +1,31 @@
 package com.example.sophie.bankomap;
 
+import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -21,11 +35,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -38,6 +54,9 @@ public class ListDataActivity extends AppCompatActivity {
     private ListView mlistView;
     ArrayList<ListViewData> listData;
     Map<String, Integer> logodict;
+    // for the export
+    private static final int MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 1;
+    private boolean permission_granted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +96,6 @@ public class ListDataActivity extends AppCompatActivity {
                                                 data.getString(9),
                                                 data.getString(6),
                                                 data.getBlob(11));
-            Toast.makeText(this, data.getString(1), Toast.LENGTH_SHORT).show();
             listData.add(lvd);
         }
         MyCustomListAdapter customAdapter = new MyCustomListAdapter(this, R.layout.custom_list, listData);
@@ -145,6 +163,7 @@ public class ListDataActivity extends AppCompatActivity {
             this.lv = l;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @NonNull
         @Override
         public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -181,11 +200,15 @@ public class ListDataActivity extends AppCompatActivity {
             logoView.setImageResource(logodict.get(l.getBank()));
             openView.setText(l.getOpen());
             feeView.setText(l.getFee());
+
             if(l.getImage().length == 0){
                 photoView.setVisibility(View.GONE);
             } else {
                 photoView.setImageBitmap(BitmapFactory.decodeByteArray(l.getImage(), 0, l.getImage().length));
             }
+
+            // Set Title for Action Bar
+            setTitle(l.getSession());
             return view;
         }
 
@@ -213,5 +236,76 @@ public class ListDataActivity extends AppCompatActivity {
             alertDialog.show();
         }
     }
-}
 
+    //export the data
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.export_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // action with ID action_refresh was selected
+            case R.id.action_export:
+                final AlertDialog.Builder export_Builder = new AlertDialog.Builder(this)
+                        .setTitle("What do you want to export?");
+
+                export_Builder.setItems(new CharSequence[]{"Export all Sessions", "Export this Session","Cancel"}, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        enableMyStorageIfPermitted();
+                                        if (permission_granted) {
+                                            switch (which) {
+                                                case 0:
+                                                    mDatabaseHelper.exportDB(ListDataActivity.this, 1, "allSessions");
+                                                    break;
+                                                case 1:
+                                                    mDatabaseHelper.exportDB(ListDataActivity.this, 0, (String) getTitle());
+                                                    break;
+                                                case 2:
+                                                    AlertDialog alert = export_Builder.create();
+                                                    alert.cancel();
+                                            }
+                                        }
+                                    }
+                                });
+                export_Builder.create().show();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    private void enableMyStorageIfPermitted() {
+        // If permission is not yet granted
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // request permission
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE);
+        } else {
+            permission_granted = true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    permission_granted = true;
+                } else
+                    Toast.makeText(this, "Cannot export data, because permission for the storage was not granted", Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+}

@@ -151,4 +151,5 @@
         android:layout_alignStart="@+id/input_notes"
         android:layout_alignLeft="@+id/input_notes"
         android:text="Add Image" />
+
 </RelativeLayout>
