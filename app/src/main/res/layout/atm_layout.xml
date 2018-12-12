@@ -150,6 +150,6 @@
         android:layout_marginTop="10dp"
         android:layout_alignStart="@+id/input_notes"
         android:layout_alignLeft="@+id/input_notes"
-        android:text="Add Image" />
+        android:text="Take Picture" />
 
 </RelativeLayout>

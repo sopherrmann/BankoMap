@@ -16,7 +16,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.MaskFilter;
 import android.graphics.Typeface;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -24,6 +28,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -55,6 +60,7 @@ import android.widget.Toolbar;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -64,6 +70,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
@@ -91,6 +98,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private Boolean mLocationPermissionGranted = false;
+    LatLng mDefaultLocation = new LatLng(48.2087623, 16.3725753);
     DatabaseHelper mDatabaseHelper;
     String str_sessionName;
     //Attributes of an ATM
@@ -176,38 +185,54 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
         enableMyLocationIfPermitted();
 
-        LatLng latlng = new LatLng(48.2087623, 16.3725753); // TODO: change latlng to current location!
+    }
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 14));
-        // Show Zoom and location button
-        // mMap.getUiSettings().setZoomControlsEnabled(true);
+    private void getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
+        try {
+            if (mLocationPermissionGranted) {
+                Task locationResult = mFusedLocationClient.getLastLocation();
+                locationResult.addOnCompleteListener(this, new OnCompleteListener() {
+                    @Override
+                    public void onComplete(@NonNull Task task) {
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            curr_location = (Location) task.getResult();
+                            if (curr_location != null) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                        new LatLng(curr_location.getLatitude(),
+                                                curr_location.getLongitude()), 14));
+                            } else {
 
-        // Setting a click event handler for the map
-        /*mMap.setOnMyLocationClickListener(new GoogleMap.OnMyLocationClickListener() {
-            @Override
-            public void onMyLocationClick(@NonNull Location location) {
-                Log.d("LocClick", "My location is " + location);
-                curr_location = location;
-                map_atm();
+                                Log.d("t", "Current location is null. Using defaults.");
+                                Log.e("t", "Exception: %s", task.getException());
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 14));
+                            }
+                        } else {
+                            Log.d("t", "Current location is null. Using defaults.");
+                            Log.e("t", "Exception: %s", task.getException());
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 14));
+                        }
+                    }
+                });
             }
-        });*/
+        } catch(SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage());
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == CAM_REQUEST){
-            //LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             bitmap = (Bitmap) data.getExtras().get("data");
-            //View atmView = dialogInflater.inflate(atm_layout, null);
-            View view = getLayoutInflater().inflate(R.layout.atm_layout, null);
-
-            //Button btn_img = view.findViewById(R.id.btn_image);
-            //Button btn_im = (Button) atmView.findViewById(R.id.btn_image);
-            //btn_img.setText("Change Image");
-            //btn_image.setBackgroundColor(Color.RED);
+            Toast.makeText(getApplicationContext(),"Image added, to change image, click again on 'Take Picture'",Toast.LENGTH_LONG).show();
         }
     }
 
@@ -305,7 +330,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         } else {
             // show location button
+            mLocationPermissionGranted = true;
             mMap.setMyLocationEnabled(true);
+            getDeviceLocation();
         }
     }
 
@@ -314,17 +341,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                            @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mLocationPermissionGranted = true;
                     mMap.setMyLocationEnabled(true);
-                else {
-                    Toast.makeText(MapsActivity.this, "App cannot be used without allowing to acces your Location",Toast.LENGTH_LONG)
+                    getDeviceLocation();
+                } else {
+                    Toast.makeText(MapsActivity.this, "App cannot be used without allowing to access your Location",Toast.LENGTH_LONG)
                             .show();
                     enableMyLocationIfPermitted();
                 }
         }
     }
 
-    //String str_sessionName = "";
     // open dialog to enter a sessionname
     private void open_startdialog(){
         LayoutInflater dialogInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -420,7 +448,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 set_curr_location();  // Set curr_location
                 // TODO handle null location
-                map_atm();
+                if (curr_location == null){
+                    Toast.makeText(getApplicationContext(),"No Location available, check if GPS is enabled",Toast.LENGTH_SHORT).show();
+                } else {
+                    map_atm();
+                }
             }
         });
         btn_end.setOnClickListener(new View.OnClickListener() {
@@ -493,7 +525,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         endDialog.show();
     }
 
-
+    int count = 0;
     private void set_curr_location(){
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -502,9 +534,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         // Got last known location. In some rare situations this can be null.
                         curr_location =  location;
                         //Toast.makeText(getApplicationContext(),"Location object" + location.toString(), Toast.LENGTH_SHORT).show();
-                        //if (location != null) {
+                        if (location == null && count<3) {
+                            set_curr_location();
+                            count++;
                             // Logic to handle location object
-                        //}
+                        }
                     }
                 });
     }
@@ -650,6 +684,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
                         }
                         image = stream.toByteArray();
+
                         MyLocation myLocation = new MyLocation(curr_location, str_sessionName,
                                 str_ophours, str_bank, str_nbAtm, str_fee, str_notes.toString(), image);
                         mDatabaseHelper.addData(myLocation);

@@ -139,7 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             FileWriter fw = new FileWriter(saveFile);
             BufferedWriter bw = new BufferedWriter(fw); //BufferedWriter
             rowcount = c.getCount();
-            colcount = c.getColumnCount();
+            colcount = c.getColumnCount()-1;
 
             if (rowcount > 0) {
                 c.moveToFirst();
@@ -162,15 +162,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     bw.write(c.getInt(0) + "," + c.getString(1) + "," + c.getDouble(2) + ",");
                     bw.write(c.getDouble(3) + ","+ c.getDouble(4) + "," + c.getLong(5) + ",");
                     bw.write(c.getString(6) + "," + c.getString(7) + "," + c.getInt(8) + ",");
-                    bw.write(c.getString(9) + "," + c.getInt(10) + "," + c.getBlob(11));
+                    bw.write(c.getString(9) + "," + c.getInt(10));
                     bw.newLine();
 
                 }
                 bw.flush();
                 bw.close();
                 Toast.makeText(act, "Exported Successfully.", Toast.LENGTH_SHORT).show();
-                // TODO enable Permission to store something
-                // TODO data is not saved as csv but as sylk!, add dependency for csvWriter
+
             }
         } catch (Exception e) {
             // TODO
