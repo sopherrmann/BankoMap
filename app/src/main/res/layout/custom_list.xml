@@ -40,6 +40,7 @@
 
     <TextView
         android:id="@+id/lat"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -59,6 +60,7 @@
 
     <TextView
         android:id="@+id/lon"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/viewLon"
@@ -107,6 +109,7 @@
         android:layout_marginStart="150dp"
         android:layout_marginLeft="150dp"
         android:layout_marginTop="33dp"
+        android:textStyle="bold"
         android:text="open:" />
 
     <TextView
@@ -127,6 +130,7 @@
         android:layout_marginStart="150dp"
         android:layout_marginLeft="150dp"
         android:layout_marginTop="55dp"
+        android:textStyle="bold"
         android:text="fee:" />
 
     <ImageView
@@ -136,9 +140,23 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="21dp"
-        android:layout_marginLeft="21dp"
-        android:layout_marginTop="93dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginLeft="55dp"
+        android:layout_marginTop="85dp"
         tools:srcCompat="@tools:sample/avatars[0]" />
+
+    <TextView
+        android:id="@+id/viewInfo"
+        android:layout_width="189dp"
+        android:layout_height="80dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="150dp"
+        android:layout_marginLeft="150dp"
+        android:layout_marginTop="85dp"
+        android:scrollbars="vertical"
+        android:layout_marginBottom="10dp"
+        android:text="TextView" />
 
 </RelativeLayout>

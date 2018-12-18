@@ -1,6 +1,7 @@
 package com.example.sophie.bankomap;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,17 +23,22 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatImageView;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -95,7 +102,8 @@ public class ListDataActivity extends AppCompatActivity {
                                                 data.getString(7),
                                                 data.getString(9),
                                                 data.getString(6),
-                                                data.getBlob(11));
+                                                data.getBlob(11),
+                                                data.getString(10));
             listData.add(lvd);
         }
         MyCustomListAdapter customAdapter = new MyCustomListAdapter(this, R.layout.custom_list, listData);
@@ -103,14 +111,14 @@ public class ListDataActivity extends AppCompatActivity {
     }
 
     class ListViewData{
-        String session, fee, open;
+        String session, fee, open, info;
         long date;
         int id;
         double lat, lon;
         String bank;
         byte[] image;
 
-        public ListViewData(int id, String session, long date, double lat, double lon, String bank, String fee, String open, byte[] image){
+        public ListViewData(int id, String session, long date, double lat, double lon, String bank, String fee, String open, byte[] image, String info){
             this.id = id;
             this.session = session;
             this.date = date;
@@ -120,6 +128,7 @@ public class ListDataActivity extends AppCompatActivity {
             this.fee = fee;
             this.open = open;
             this.image = image;
+            this.info = info;
         }
 
         public int getId() {
@@ -148,6 +157,9 @@ public class ListDataActivity extends AppCompatActivity {
         }
         public byte[] getImage() {
             return image;
+        }
+        public String getInfo() {
+            return info;
         }
     }
 
@@ -178,7 +190,6 @@ public class ListDataActivity extends AppCompatActivity {
             TextView feeView = (TextView) view.findViewById(R.id.viewFee);
             ImageView logoView = (ImageView) view.findViewById(R.id.viewLogo);
             Button deleteButton = (Button) view.findViewById(R.id.buttonDelete);
-            ImageView photoView = (ImageView) view.findViewById(R.id.viewPhoto);
 
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -200,6 +211,34 @@ public class ListDataActivity extends AppCompatActivity {
             logoView.setImageResource(logodict.get(l.getBank()));
             openView.setText(l.getOpen());
             feeView.setText(l.getFee());
+
+
+
+            ImageView photoView = (ImageView) view.findViewById(R.id.viewPhoto);
+            TextView infoView = (TextView) view.findViewById(R.id.viewInfo);
+            infoView.setText(l.getInfo());
+            infoView.setMaxLines(100);
+            infoView.setVerticalScrollBarEnabled(true);
+            infoView.setMovementMethod(new ScrollingMovementMethod());
+            View.OnTouchListener listener = new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    boolean isLarger;
+
+                    isLarger = ((TextView) v).getLineCount()
+                            * ((TextView) v).getLineHeight() > v.getHeight();
+                    if (event.getAction() == MotionEvent.ACTION_MOVE
+                            && isLarger) {
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+
+                    } else {
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+
+                    }
+                    return false;
+                }
+            };
+            infoView.setOnTouchListener(listener);
 
             if(l.getImage().length == 0){
                 photoView.setVisibility(View.GONE);
