@@ -212,8 +212,6 @@ public class ListDataActivity extends AppCompatActivity {
             openView.setText(l.getOpen());
             feeView.setText(l.getFee());
 
-
-
             ImageView photoView = (ImageView) view.findViewById(R.id.viewPhoto);
             TextView infoView = (TextView) view.findViewById(R.id.viewInfo);
             infoView.setText(l.getInfo());

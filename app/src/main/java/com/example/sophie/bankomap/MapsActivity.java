@@ -40,6 +40,7 @@ import android.text.Editable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -116,7 +117,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button btn_atmmap;
     Button btn_end;
     Button btn_del;
+    Button btn_bg;
+    Button btn_adj;
     TextView disp_sesname;
+
+    double curr_lat;
+    double curr_lon;
 
     Map<String, Integer> logodict;
 
@@ -134,6 +140,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_end = findViewById(R.id.btn_end);
         btn_del = findViewById(R.id.btn_del);
         disp_sesname = findViewById(R.id.disp_sesname);
+        btn_bg = (Button) findViewById(R.id.btn_map_bg);
 
         // Logos für die Banken
         logodict = new HashMap<String, Integer>();
@@ -162,6 +169,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 open_loaddialog();
             }
         });
+        btn_bg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(btn_bg.getText().toString().equals("TERRAIN")){
+                    mMap.setMapType(mMap.MAP_TYPE_TERRAIN);
+                    btn_bg.setText("SATELLITE");
+                }else{
+                    mMap.setMapType(mMap.MAP_TYPE_SATELLITE);
+                    btn_bg.setText("TERRAIN");
+                }
+            }
+        });
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
@@ -185,9 +204,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        mMap.setMapType(mMap.MAP_TYPE_SATELLITE);
         enableMyLocationIfPermitted();
-
     }
 
     private void getDeviceLocation() {
@@ -258,12 +276,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     final int curr_ID = (int) marker.getTag();
                     Cursor data_row = mDatabaseHelper.getRow(curr_ID);
                     data_row.moveToNext();
+                    curr_lat = data_row.getDouble(2);
+                    curr_lon = data_row.getDouble(3);
                     final AlertDialog info_builder = new AlertDialog.Builder(MapsActivity.this)
                             .setTitle(data_row.getString(7))
                             .setView(marker_infoView).create();
 
                     info_builder.show();
-
 
                     TextView tv_fee = marker_infoView.findViewById(R.id.viewFee);
                     TextView tv_ophours = marker_infoView.findViewById(R.id.viewOpen);
@@ -283,11 +302,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     });
 
+                    Button btn_adjustMarker = marker_infoView.findViewById(R.id.buttonAdjust);
+                    btn_adjustMarker.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            deleteMarkers();
+                            mMap.setOnMapLongClickListener(new OnMapLongClickListener() {
+                                @Override
+                                public void onMapLongClick(LatLng latLng) {
+                                    // Creating a marker
+                                    MarkerOptions markerOptions = new MarkerOptions();
+                                    markerOptions.position(latLng);
+                                    // This will be displayed on taping the marker
+                                    markerOptions.title(String.format("lat: %.2f\nlon: %.2f", latLng.latitude, latLng.longitude));
+                                    // Clears the previously touched position
+                                    mMap.clear();
+                                    // Animating to the touched position
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                                    mMap.addMarker(markerOptions);
+                                    /*
+                                    Date currentTime = Calendar.getInstance().getTime();
+                                    //Toast.makeText(getApplicationContext(), currentTime.toString(), Toast.LENGTH_SHORT).show();
+                                    MyLocation myLocation = new MyLocation(str_sessionName, latLng.latitude, latLng.longitude, currentTime.toString());
+                                    mDatabaseHelper = new DatabaseHelper(getApplicationContext());
+                                    mDatabaseHelper.addData(myLocation);
+
+                                    Intent intent = new Intent(getApplicationContext(), ListDataActivity.class);
+                                    intent.putExtra("session_name", str_sessionName);
+                                    startActivity(intent);*/
+                                }
+                            });
+                        }
+                    });
+
                     tv_fee.setText(data_row.getString(9));
                     tv_ophours.setText(data_row.getString(6));
                     tv_nbatms.setText(data_row.getString(8));
                     tv_comments.setText(data_row.getString(10));
-                    tv_lat.setText(String.format("%.2f",data_row.getDouble(2)));
+                    View.OnTouchListener listener = new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            boolean isLarger;
+
+                            isLarger = ((TextView) v).getLineCount()
+                                    * ((TextView) v).getLineHeight() > v.getHeight();
+                            if (event.getAction() == MotionEvent.ACTION_MOVE
+                                    && isLarger) {
+                                v.getParent().requestDisallowInterceptTouchEvent(true);
+
+                            } else {
+                                v.getParent().requestDisallowInterceptTouchEvent(false);
+
+                            }
+                            return false;
+                        }
+                    };
+                    tv_comments.setOnTouchListener(listener);
+
+
+                    tv_lat.setText(String.format("%.2f", data_row.getDouble(2)));
                     tv_lon.setText(String.format("%.2f", data_row.getDouble(3)));
                     Date currentDate = new Date(data_row.getLong(5));
                     Calendar calendar = Calendar.getInstance();
@@ -297,13 +370,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     tv_time.setText(datetext);
                     logoView.setImageResource(logodict.get(data_row.getString(7)));
 
-                    // if there is no image for the ATM
-
                     if (data_row.getBlob(11).length == 0){
-                        LinearLayout ll_photo =  marker_infoView.findViewById(R.id.third_line);
-                        ll_photo.setVisibility(View.GONE);
-                        LinearLayout ll_delete = marker_infoView.findViewById(R.id.fourth_line);
-
+                        photoView.setVisibility(View.GONE);
                     }
                     else {
                         photoView.setImageBitmap(BitmapFactory.decodeByteArray(data_row.getBlob(11), 0, data_row.getBlob(11).length));
@@ -726,7 +794,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-
-
-
 }

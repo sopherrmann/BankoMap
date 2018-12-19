@@ -90,7 +90,6 @@
             android:text="Add"
             android:visibility="invisible" />
 
-
         <Button
             android:id="@+id/btn_del"
             android:layout_width="wrap_content"
@@ -109,7 +108,16 @@
             android:layout_centerHorizontal="true"
             android:text="End"
             android:visibility="invisible" />
-        >>>>>>> Stashed changes
 
+        <Button
+            android:id="@+id/btn_map_bg"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="55dp"
+            android:layout_marginTop="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TERRAIN"
+            android:visibility="visible" />
     </RelativeLayout>
 </LinearLayout>
