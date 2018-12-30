@@ -452,7 +452,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     sessionDialog.cancel();
                                     start_session(str_sessionName);
 
-                                    Toast.makeText(getApplicationContext(), "Click on the Sessionname to see all registered ATMs", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "Click on the Sessionname to see and export all registered ATMs", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         })
@@ -483,7 +483,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 str_sessionName = arrayAdapter.getItem(which);
-                Toast.makeText(getApplicationContext(), "Click on the Sessionname to see all registered ATMs", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Click on the Sessionname to see and export all registered ATMs", Toast.LENGTH_SHORT).show();
                 start_session(str_sessionName);
                 showMarkers(str_sessionName);
             }});
@@ -744,10 +744,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onClick(DialogInterface dialog, int which) {
                         str_notes = input_notes.getText();
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        /*if(bitmap == null){
-                            bitmap = BitmapFactory.decodeResource(getResources(),
-                                    R.drawable.logo_bank_austria);
-                        }*/
+
                         if(bitmap != null){
                             bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
                         }

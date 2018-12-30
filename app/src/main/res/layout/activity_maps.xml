@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
@@ -50,74 +51,88 @@
 
         <Button
             android:id="@+id/btn_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="90dp"
+            android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="36dp"
             android:layout_marginRight="36dp"
             android:layout_marginBottom="18dp"
+            android:background="@color/colorPrimary"
             android:onClick="startsession"
-            android:text="Start" />
+            android:text="Start"
+            android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
         <Button
             android:id="@+id/btn_load"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/btn_start"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginStart="159dp"
-            android:layout_marginLeft="159dp"
+            android:layout_width="90dp"
+            android:layout_height="40dp"
+            android:layout_alignTop="@+id/btn_start"
+            android:layout_alignBottom="@+id/btn_start"
             android:layout_marginEnd="13dp"
             android:layout_marginRight="13dp"
-            android:layout_marginBottom="-48dp"
             android:layout_toStartOf="@+id/btn_start"
             android:layout_toLeftOf="@+id/btn_start"
-            android:text="Load" />
+            android:background="@color/colorPrimary"
+            android:text="Load"
+            android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
         <Button
             android:id="@+id/btn_atmmap"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
+            android:layout_alignBottom="@+id/btn_start"
+            android:layout_alignTop="@+id/btn_start"
             android:layout_marginEnd="36dp"
             android:layout_marginRight="36dp"
             android:layout_marginBottom="18dp"
+            android:background="@color/colorPrimary"
             android:text="Add"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
             android:visibility="invisible" />
 
         <Button
             android:id="@+id/btn_del"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/btn_atmmap"
+            android:layout_height="40dp"
             android:layout_marginLeft="36dp"
             android:layout_marginBottom="0dp"
+            android:layout_alignBottom="@+id/btn_start"
+            android:layout_alignTop="@+id/btn_start"
+            android:background="@color/colorPrimary"
             android:text="Delete"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
             android:visibility="invisible" />
 
         <Button
             android:id="@+id/btn_end"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/btn_atmmap"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/btn_start"
+            android:layout_alignTop="@+id/btn_start"
             android:layout_centerHorizontal="true"
+            android:background="@color/colorPrimary"
             android:text="End"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
             android:visibility="invisible" />
 
         <Button
             android:id="@+id/btn_map_bg"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="55dp"
-            android:layout_marginTop="7dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="11dp"
+            android:layout_marginRight="55dp"
+            android:layout_marginEnd="55dp"
+            android:background="@color/colorPrimary"
             android:text="TERRAIN"
             android:visibility="visible" />
+
     </RelativeLayout>
 </LinearLayout>
