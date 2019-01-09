@@ -302,7 +302,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     });
 
-                    Button btn_adjustMarker = marker_infoView.findViewById(R.id.buttonAdjust);
+                    /*Button btn_adjustMarker = marker_infoView.findViewById(R.id.buttonAdjust);
                     btn_adjustMarker.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -320,7 +320,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     // Animating to the touched position
                                     mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                                     mMap.addMarker(markerOptions);
-                                    /*
+
                                     Date currentTime = Calendar.getInstance().getTime();
                                     //Toast.makeText(getApplicationContext(), currentTime.toString(), Toast.LENGTH_SHORT).show();
                                     MyLocation myLocation = new MyLocation(str_sessionName, latLng.latitude, latLng.longitude, currentTime.toString());
@@ -329,11 +329,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                     Intent intent = new Intent(getApplicationContext(), ListDataActivity.class);
                                     intent.putExtra("session_name", str_sessionName);
-                                    startActivity(intent);*/
+                                    startActivity(intent);
                                 }
                             });
                         }
-                    });
+                    });*/
 
                     tv_fee.setText(data_row.getString(9));
                     tv_ophours.setText(data_row.getString(6));
@@ -452,7 +452,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     sessionDialog.cancel();
                                     start_session(str_sessionName);
 
-                                    Toast.makeText(getApplicationContext(), "Click on the Sessionname to see and export all registered ATMs", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "Click on the Sessionname to see and export all registered ATMs", Toast.LENGTH_LONG).show();
                                 }
                             }
                         })
@@ -483,7 +483,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 str_sessionName = arrayAdapter.getItem(which);
-                Toast.makeText(getApplicationContext(), "Click on the Sessionname to see and export all registered ATMs", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Click on the Sessionname to see and export all registered ATMs", Toast.LENGTH_LONG).show();
                 start_session(str_sessionName);
                 showMarkers(str_sessionName);
             }});
