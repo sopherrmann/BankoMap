@@ -1,0 +1,16 @@
+Evaluation: anmerkungen
+	- man hätte die Definition der Bankomaten besser angeben sollen, nur Sachen, die für die Geldausgabe da sind, sonst nicht
+		wird in Banken drinnen sehr schnell unübersichtlich
+	- die Definition des Öffnungszeiten hätte besser sein sollen, Bankomaten, die in einer Bank sind, können meist mit Bankomatkarte erreicht werden,
+		somit gibt es keine Öffnungszeiten
+	- Standpunktsgenauigkeit ist sehr abhängig von Handy, Verbesserung durch manuelle Änderung der Koordinaten
+	- Höhenangaben der GPS-Messungen sind sehr ungenau, variieren bis zu 67m!
+	- bei Bankomaten die einzeln draußen stehen oder in Geschäften stehen, waren die Angaben sehr einheitlich
+	- alle Bankomaten wurden von allen gefunden
+	
+Studie: Anmerkungen
+	-mehr Handys für schnelleren Ablauf 
+	-Route war gut gewählt, viele ATMs und große Variation der Arten 
+	
+	
+	
